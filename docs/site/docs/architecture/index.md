@@ -44,6 +44,32 @@ Images are published to GitHub Container Registry on every push to `develop` or
 `main` via the `docker-publish.yml` workflow. Each image is scanned with Trivy
 before push and includes SLSA build provenance attestation.
 
+### Image namespace
+
+Image URLs use the **user namespace** (`ghcr.io/wphillipmoore/...`), not a
+repo-specific namespace. This means image paths are stable across repository
+migrations — they do not change when the publishing repository changes.
+
+### Authentication
+
+The workflow authenticates with `GITHUB_TOKEN` using `packages: write`
+permission. No personal access token or additional secret is needed.
+
+### GHCR package access grants
+
+Each `dev-*` package on GHCR must explicitly grant this repository write
+access. The packages were originally created by the `standard-tooling`
+repository, so that repo has implicit write access. This repo does not,
+unless manually configured.
+
+Per-package setup (one-time, for each of `dev-python`, `dev-java`, `dev-go`,
+`dev-ruby`, `dev-rust`):
+
+1. Navigate to the package settings page on GHCR.
+2. Under **Manage Actions access**, click **Add Repository**.
+3. Select `standard-tooling-docker`.
+4. Set role to **Write**.
+
 ## Consumption
 
 Images are consumed via the `docker-test` script in
