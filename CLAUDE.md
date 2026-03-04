@@ -82,6 +82,25 @@ workflow on push to `develop` or `main`, or via manual `workflow_dispatch`.
 
 Image naming: `ghcr.io/wphillipmoore/dev-{language}:{version}`
 
+Image URLs use the **user namespace** (`ghcr.io/wphillipmoore/...`), not a
+repo-specific namespace. This means image paths are stable across repo
+migrations — they do not change when the publishing repository changes.
+
+#### Publishing prerequisites
+
+The workflow uses `secrets.GITHUB_TOKEN` with `packages: write` permission.
+No PAT or additional secret is needed. However, each GHCR package must
+explicitly grant this repository write access because the packages were
+originally created by the `standard-tooling` repository.
+
+Per-package setup (one-time, for each of `dev-python`, `dev-java`, `dev-go`,
+`dev-ruby`, `dev-rust`):
+
+1. Navigate to the package settings page on GHCR.
+2. Under **Manage Actions access**, click **Add Repository**.
+3. Select `standard-tooling-docker`.
+4. Set role to **Write**.
+
 ### Version Matrix
 
 | Language | Versions         |
