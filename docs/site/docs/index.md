@@ -15,13 +15,13 @@ environment.
 
 All images are published to `ghcr.io/wphillipmoore/dev-<language>:<version>`.
 
-| Language | Versions | Image |
-|----------|----------|-------|
-| Python | 3.12, 3.13, 3.14 | `dev-python` |
-| Ruby | 3.2, 3.3, 3.4 | `dev-ruby` |
-| Go | 1.25, 1.26 | `dev-go` |
-| Java | 17, 21 | `dev-java` |
-| Rust | 1.92, 1.93 | `dev-rust` |
+| Language | Versions         | Image        |
+| -------- | ---------------- | ------------ |
+| Python   | 3.12, 3.13, 3.14 | `dev-python` |
+| Ruby     | 3.2, 3.3, 3.4    | `dev-ruby`   |
+| Go       | 1.25, 1.26       | `dev-go`     |
+| Java     | 17, 21           | `dev-java`   |
+| Rust     | 1.92, 1.93       | `dev-rust`   |
 
 See [Images](images/index.md) for per-language tool details.
 

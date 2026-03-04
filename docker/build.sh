@@ -7,7 +7,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 
 build() {
-  local lang="$1" tag="$2" version_arg="$3" version_val="$4"
+  local lang="$1" version_arg="$3" version_val="$4"
   echo "Building dev-${lang}:${version_val} ..."
   docker build \
     --build-arg "${version_arg}=${version_val}" \

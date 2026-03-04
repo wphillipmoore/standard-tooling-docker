@@ -16,16 +16,20 @@ Docker-first development across all managed repositories.
 
 **Status**: Active
 
-**Canonical Standards**: This repository follows standards at <https://github.com/wphillipmoore/standards-and-conventions> (local path: `../standards-and-conventions` if available)
+**Canonical Standards**: This repository follows standards at
+<https://github.com/wphillipmoore/standards-and-conventions>
+(local path: `../standards-and-conventions` if available)
 
 ## Development Commands
 
 ### Environment Setup
 
 ```bash
-cd ../standard-tooling && uv sync                                                # Install standard-tooling
-export PATH="../standard-tooling/.venv/bin:../standard-tooling/scripts/bin:$PATH" # Put tools on PATH
-git config core.hooksPath ../standard-tooling/scripts/lib/git-hooks               # Enable git hooks
+cd ../standard-tooling && uv sync              # Install standard-tooling
+export PATH="../standard-tooling/.venv/bin\
+:../standard-tooling/scripts/bin:$PATH"        # Put tools on PATH
+git config core.hooksPath \
+  ../standard-tooling/scripts/lib/git-hooks    # Enable git hooks
 ```
 
 ### Validation
@@ -80,13 +84,13 @@ Image naming: `ghcr.io/wphillipmoore/dev-{language}:{version}`
 
 ### Version Matrix
 
-| Language | Versions       |
-|----------|----------------|
-| Ruby     | 3.2, 3.3, 3.4 |
+| Language | Versions         |
+| -------- | ---------------- |
+| Ruby     | 3.2, 3.3, 3.4    |
 | Python   | 3.12, 3.13, 3.14 |
-| Java     | 17, 21         |
-| Go       | 1.25, 1.26     |
-| Rust     | 1.92, 1.93     |
+| Java     | 17, 21           |
+| Go       | 1.25, 1.26       |
+| Rust     | 1.92, 1.93       |
 
 To trigger a rebuild manually: Actions > "Publish dev container images" >
 Run workflow.
