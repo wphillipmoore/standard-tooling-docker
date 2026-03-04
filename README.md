@@ -6,6 +6,14 @@ Each image provides a language runtime plus shared tooling (Node.js, ShellCheck,
 markdownlint) used by CI and local Docker-first development across all managed
 repositories.
 
+## Table of Contents
+
+- [Available Images](#available-images)
+- [Usage](#usage)
+- [Common Tooling](#common-tooling)
+- [Publishing](#publishing)
+- [Migration Note](#migration-note)
+
 ## Available Images
 
 All images are published to GitHub Container Registry at
