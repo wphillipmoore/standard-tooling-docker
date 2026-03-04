@@ -37,7 +37,7 @@ git config core.hooksPath \
 ```bash
 hadolint docker/*/Dockerfile    # Lint Dockerfiles
 shellcheck docker/build.sh      # Lint shell scripts
-markdownlint '**/*.md'          # Lint Markdown
+markdownlint .                  # Lint Markdown
 ```
 
 ### Building Images Locally
