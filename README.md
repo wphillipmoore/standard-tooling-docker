@@ -11,13 +11,13 @@ repositories.
 All images are published to GitHub Container Registry at
 `ghcr.io/wphillipmoore/dev-{language}:{version}`.
 
-| Image | Versions | Base |
-|-------|----------|------|
-| `dev-ruby` | 3.2, 3.3, 3.4 | `ruby:<v>-slim` |
-| `dev-python` | 3.12, 3.13, 3.14 | `python:<v>-slim` |
-| `dev-java` | 17, 21 | `eclipse-temurin:<v>-jdk` |
-| `dev-go` | 1.25, 1.26 | `golang:<v>` |
-| `dev-rust` | 1.92, 1.93 | `rust:<v>-slim` |
+| Image        | Versions         | Base                      |
+| ------------ | ---------------- | ------------------------- |
+| `dev-ruby`   | 3.2, 3.3, 3.4    | `ruby:<v>-slim`           |
+| `dev-python` | 3.12, 3.13, 3.14 | `python:<v>-slim`         |
+| `dev-java`   | 17, 21           | `eclipse-temurin:<v>-jdk` |
+| `dev-go`     | 1.25, 1.26       | `golang:<v>`              |
+| `dev-rust`   | 1.92, 1.93       | `rust:<v>-slim`           |
 
 ## Usage
 

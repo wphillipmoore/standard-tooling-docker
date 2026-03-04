@@ -26,7 +26,12 @@
 
 ## Validation policy
 
-- canonical_local_validation_command: hadolint docker/*/Dockerfile && shellcheck docker/build.sh && markdownlint .
+<!-- markdownlint-disable MD013 -->
+
+- canonical_local_validation_command:
+  `hadolint docker/*/Dockerfile && shellcheck docker/build.sh && markdownlint .`
+
+<!-- markdownlint-enable MD013 -->
 - validation_required: yes (hadolint, shellcheck, markdownlint required)
 
 ## External tooling dependencies
