@@ -35,6 +35,8 @@ CVE-2026-23066
 CVE-2026-23152
 CVE-2026-23171
 CVE-2026-23210
+CVE-2025-71152
+CVE-2026-23226
 
 # Debian system cpython — present in go/ruby base images via Debian
 # packages. Not the language runtime we use, no Debian patch available.
@@ -66,6 +68,8 @@ CVE-2026-24842
 CVE-2026-26960
 CVE-2026-26996
 CVE-2026-27699
+CVE-2026-27903
+CVE-2026-27904
 
 # Node.js CVEs — should be resolved by Node 22.22.0 upgrade. Listed
 # here as safety net in case Trivy DB still attributes them to copied
