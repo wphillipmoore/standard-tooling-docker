@@ -62,6 +62,22 @@ Images are published automatically on push to `develop` or `main` via the
 `docker-publish.yml` workflow. Manual rebuilds can be triggered via
 `workflow_dispatch` in the Actions tab.
 
+Image URLs use the user namespace (`ghcr.io/wphillipmoore/...`), not a
+repo-specific namespace, so paths remain stable across repo migrations.
+
+### GHCR access prerequisites
+
+The workflow authenticates with `GITHUB_TOKEN` (`packages: write`). No PAT
+or additional secret is needed. Each GHCR package must grant this repository
+write access because the packages were originally created by the
+`standard-tooling` repository:
+
+1. Go to the package settings page on GHCR for each `dev-*` package.
+2. Under **Manage Actions access**, click **Add Repository**.
+3. Select `standard-tooling-docker` and set the role to **Write**.
+
+This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`, `dev-rust`.
+
 ## Migration Note
 
 These images were originally maintained in the
