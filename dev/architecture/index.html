@@ -670,6 +670,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Publishing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#image-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image namespace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ghcr-package-access-grants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GHCR package access grants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -759,6 +798,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Publishing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#image-namespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image namespace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ghcr-package-access-grants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GHCR package access grants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -822,6 +900,26 @@ reproducibility.</p>
 <p>Images are published to GitHub Container Registry on every push to <code>develop</code> or
 <code>main</code> via the <code>docker-publish.yml</code> workflow. Each image is scanned with Trivy
 before push and includes SLSA build provenance attestation.</p>
+<h3 id="image-namespace">Image namespace<a class="headerlink" href="#image-namespace" title="Permanent link">&para;</a></h3>
+<p>Image URLs use the <strong>user namespace</strong> (<code>ghcr.io/wphillipmoore/...</code>), not a
+repo-specific namespace. This means image paths are stable across repository
+migrations — they do not change when the publishing repository changes.</p>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
+<p>The workflow authenticates with <code>GITHUB_TOKEN</code> using <code>packages: write</code>
+permission. No personal access token or additional secret is needed.</p>
+<h3 id="ghcr-package-access-grants">GHCR package access grants<a class="headerlink" href="#ghcr-package-access-grants" title="Permanent link">&para;</a></h3>
+<p>Each <code>dev-*</code> package on GHCR must explicitly grant this repository write
+access. The packages were originally created by the <code>standard-tooling</code>
+repository, so that repo has implicit write access. This repo does not,
+unless manually configured.</p>
+<p>Per-package setup (one-time, for each of <code>dev-python</code>, <code>dev-java</code>, <code>dev-go</code>,
+<code>dev-ruby</code>, <code>dev-rust</code>):</p>
+<ol>
+<li>Navigate to the package settings page on GHCR.</li>
+<li>Under <strong>Manage Actions access</strong>, click <strong>Add Repository</strong>.</li>
+<li>Select <code>standard-tooling-docker</code>.</li>
+<li>Set role to <strong>Write</strong>.</li>
+</ol>
 <h2 id="consumption">Consumption<a class="headerlink" href="#consumption" title="Permanent link">&para;</a></h2>
 <p>Images are consumed via the <code>docker-test</code> script in
 <a href="https://github.com/wphillipmoore/standard-tooling">standard-tooling</a>. The
