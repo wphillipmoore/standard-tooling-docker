@@ -8,30 +8,30 @@ and tools. Images are published to
 
 All images include:
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Node.js | 22.22.0 | Runtime for markdownlint-cli |
-| ShellCheck | 0.11.0 | Shell script linting |
-| markdownlint-cli | 0.47.0 | Markdown linting |
-| git | latest | Repository operations |
-| curl | latest | HTTP requests |
+| Tool             | Version | Purpose                      |
+| ---------------- | ------- | ---------------------------- |
+| Node.js          | 22.22.0 | Runtime for markdownlint-cli |
+| ShellCheck       | 0.11.0  | Shell script linting         |
+| markdownlint-cli | 0.47.0  | Markdown linting             |
+| git              | latest  | Repository operations        |
+| curl             | latest  | HTTP requests                |
 
 ## Python
 
 **Base**: `python:<version>-slim`
 **Versions**: 3.12, 3.13, 3.14
 
-| Tool | Source | Purpose |
-|------|--------|---------|
-| uv | `ghcr.io/astral-sh/uv:latest` | Python package manager |
+| Tool | Source                        | Purpose                |
+| ---- | ----------------------------- | ---------------------- |
+| uv   | `ghcr.io/astral-sh/uv:latest` | Python package manager |
 
 ## Ruby
 
 **Base**: `ruby:<version>-slim`
 **Versions**: 3.2, 3.3, 3.4
 
-| Tool | Source | Purpose |
-|------|--------|---------|
+| Tool    | Source     | Purpose                 |
+| ------- | ---------- | ----------------------- |
 | bundler | system gem | Ruby dependency manager |
 
 ## Go
@@ -39,12 +39,12 @@ All images include:
 **Base**: `golang:<version>`
 **Versions**: 1.25, 1.26
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| golangci-lint | 2.10.1 | Go linter aggregator |
-| govulncheck | 1.1.4 | Vulnerability scanner |
-| go-licenses | 2.0.1 | License checker |
-| gocyclo | 0.6.0 | Cyclomatic complexity |
+| Tool          | Version | Purpose               |
+| ------------- | ------- | --------------------- |
+| golangci-lint | 2.10.1  | Go linter aggregator  |
+| govulncheck   | 1.1.4   | Vulnerability scanner |
+| go-licenses   | 2.0.1   | License checker       |
+| gocyclo       | 0.6.0   | Cyclomatic complexity |
 
 ## Java
 
@@ -60,10 +60,10 @@ pre-installed.
 **Base**: `rust:<version>-slim`
 **Versions**: 1.92, 1.93
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| clippy | rustup component | Rust linter |
-| rustfmt | rustup component | Code formatter |
-| llvm-tools | rustup component | Coverage instrumentation |
-| cargo-deny | 0.18.2 | Dependency security checker |
-| cargo-llvm-cov | 0.6.16 | Code coverage |
+| Tool           | Version          | Purpose                     |
+| -------------- | ---------------- | --------------------------- |
+| clippy         | rustup component | Rust linter                 |
+| rustfmt        | rustup component | Code formatter              |
+| llvm-tools     | rustup component | Coverage instrumentation    |
+| cargo-deny     | 0.18.2           | Dependency security checker |
+| cargo-llvm-cov | 0.6.16           | Code coverage               |

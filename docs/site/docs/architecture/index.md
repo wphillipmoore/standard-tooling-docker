@@ -6,7 +6,7 @@ All images are built from a single `docker/build.sh` script that iterates over
 every language and version combination. Each language has its own Dockerfile
 under `docker/<language>/Dockerfile`.
 
-```
+```text
 docker/
 ├── build.sh              # Builds all 14 images
 ├── python/Dockerfile
