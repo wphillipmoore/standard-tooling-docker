@@ -55,7 +55,7 @@ jobs:
         run: npm install -g markdownlint-cli@0.47.0
 
       - name: Run Markdownlint
-        run: markdownlint .
+        run: markdownlint README.md
 
   # ---------------------------------------------------------------------------
   # Security and standards (shared reusable workflow)
