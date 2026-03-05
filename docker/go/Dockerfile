@@ -45,6 +45,6 @@ RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 &&
     go install github.com/google/go-licenses/v2@v2.0.1 && \
     go install github.com/fzipp/gocyclo/cmd/gocyclo@v0.6.0 && \
     go install golang.org/x/tools/cmd/goimports@v0.42.0 && \
-    go install github.com/vladopajic/go-test-coverage/v2@latest
+    go install github.com/vladopajic/go-test-coverage/v2@v2.18.3
 
 WORKDIR /workspace

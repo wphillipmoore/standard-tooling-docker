@@ -37,6 +37,8 @@ CVE-2026-23171
 CVE-2026-23210
 CVE-2025-71152
 CVE-2026-23226
+CVE-2025-71238
+CVE-2026-23231
 
 # Debian system cpython — present in go/ruby base images via Debian
 # packages. Not the language runtime we use, no Debian patch available.
@@ -55,6 +57,18 @@ CVE-2026-0861
 
 CVE-2026-24882
 
+# Go stdlib CVEs in shfmt 3.12.0 binary — shfmt does not exercise any of
+# these code paths (no TLS, no database/sql, no archive processing, no URL
+# parsing, no x509 cert handling). Awaiting shfmt rebuild with patched Go.
+
+CVE-2025-47907
+CVE-2025-58183
+CVE-2025-61726
+CVE-2025-61728
+CVE-2025-61729
+CVE-2025-61730
+CVE-2025-68121
+
 # npm transitive dependencies from markdownlint-cli@0.47.0 — no fix
 # available without an upstream markdownlint-cli release.
 
@@ -70,6 +84,7 @@ CVE-2026-26996
 CVE-2026-27699
 CVE-2026-27903
 CVE-2026-27904
+GHSA-qffp-2rhf-9h96
 
 # Node.js CVEs — should be resolved by Node 22.22.0 upgrade. Listed
 # here as safety net in case Trivy DB still attributes them to copied
