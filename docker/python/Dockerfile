@@ -24,6 +24,20 @@ RUN curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHEL
 RUN npm install -g markdownlint-cli@0.47.0 && \
     npm cache clean --force
 
+ARG SHFMT_VERSION=3.12.0
+RUN curl -fsSL "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" \
+    -o /usr/local/bin/shfmt && chmod +x /usr/local/bin/shfmt
+
+ARG ACTIONLINT_VERSION=1.7.11
+RUN curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+    | tar -xz -C /usr/local/bin/ actionlint
+
+ARG TAPLO_VERSION=0.10.0
+RUN curl -fsSL "https://github.com/tamasfe/taplo/releases/download/${TAPLO_VERSION}/taplo-linux-x86_64.gz" \
+    | gunzip > /usr/local/bin/taplo && chmod +x /usr/local/bin/taplo
+
+RUN pip install --no-cache-dir yamllint==1.38.0
+
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /workspace
