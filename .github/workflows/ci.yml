@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli@0.47.0
+        run: npm install -g markdownlint-cli@0.41.0
 
       - name: Run Markdownlint
         run: markdownlint README.md
@@ -62,11 +62,13 @@ jobs:
   # ---------------------------------------------------------------------------
 
   security-and-standards:
-    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@v1.1
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@develop
     with:
       language: shell
+      semgrep-language: dockerfile
       run-standards: 'true'
       run-security: 'true'
+      run-codeql: 'false'
     permissions:
       contents: read
       security-events: write
