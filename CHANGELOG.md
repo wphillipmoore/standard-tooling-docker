@@ -9,6 +9,8 @@
 ### 🐛 Bug Fixes
 
 - Scope standalone markdownlint step to README.md only (#197) (#13)
+- Update trivyignore for new CVEs and pin go-test-coverage (#21)
+- Pin go-test-coverage to v2.18.3 for hadolint DL3062
 
 ### 📚 Documentation
 
@@ -25,3 +27,5 @@
 - Suppress four new CVEs in trivyignore
 - Use .markdownlintignore for lint exclusions (#190) (#9)
 - Install standard-tooling plugin via marketplace (#12)
+- Prepare release 1.0.0
+- Merge main into release/1.0.0
