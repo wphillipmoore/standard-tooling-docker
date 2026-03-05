@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-minimal
 
 RUN rustup component add clippy rustfmt llvm-tools
 
-RUN cargo install cargo-deny@0.18.2 && \
+RUN cargo install cargo-deny@0.19.0 && \
     cargo install cargo-llvm-cov@0.6.16 && \
     rm -rf /usr/local/cargo/registry
 
