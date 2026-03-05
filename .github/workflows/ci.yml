@@ -62,7 +62,7 @@ jobs:
   # ---------------------------------------------------------------------------
 
   security-and-standards:
-    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@bugfix/172-fix-ci-security-failures
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@develop
     with:
       language: shell
       semgrep-language: dockerfile
