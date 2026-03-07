@@ -125,3 +125,47 @@ jobs:
         with:
           subject-name: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}"
           subject-digest: ${{ steps.digest.outputs.digest }}
+
+  publish-docs:
+    name: "publish: dev-docs:latest"
+    needs: [hadolint]
+    runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/wphillipmoore/dev-docs:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        run: docker build -t "$IMAGE" docker/docs
+
+      - name: Trivy image scan
+        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.1
+        with:
+          scan-type: image
+          scan-ref: ${{ env.IMAGE }}
+          exit-code: "1"
+          sarif-category: trivy-image-docs
+          trivyignores: .trivyignore
+
+      - name: Push image
+        run: docker push "$IMAGE"
+
+      - name: Get image digest
+        id: digest
+        run: |
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ghcr.io/wphillipmoore/dev-docs
+          subject-digest: ${{ steps.digest.outputs.digest }}
