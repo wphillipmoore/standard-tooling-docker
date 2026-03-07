@@ -40,6 +40,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-minimal
     && pip install --no-cache-dir --break-system-packages yamllint==1.38.0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+RUN uv python install 3.14
+
+RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /opt/standard-tooling \
+    && uv sync --frozen --no-group dev --python 3.14 --project /opt/standard-tooling
+ENV PATH="/opt/standard-tooling/.venv/bin:$PATH"
+
 # Maven wrapper self-bootstraps from consuming repos.
 
 WORKDIR /workspace

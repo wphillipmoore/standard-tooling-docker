@@ -14,7 +14,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      xz-utils && \
+      git xz-utils && \
     rm -rf /var/lib/apt/lists/*
 
 ARG SHELLCHECK_VERSION=0.11.0
@@ -46,5 +46,12 @@ RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 &&
     go install github.com/fzipp/gocyclo/cmd/gocyclo@v0.6.0 && \
     go install golang.org/x/tools/cmd/goimports@v0.42.0 && \
     go install github.com/vladopajic/go-test-coverage/v2@v2.18.3
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+RUN uv python install 3.14
+
+RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /opt/standard-tooling \
+    && uv sync --frozen --no-group dev --python 3.14 --project /opt/standard-tooling
+ENV PATH="/opt/standard-tooling/.venv/bin:$PATH"
 
 WORKDIR /workspace
