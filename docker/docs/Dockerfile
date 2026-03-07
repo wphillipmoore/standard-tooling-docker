@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /opt/standard-tooling \
-    && cd /opt/standard-tooling && uv sync --frozen --no-group dev
+    && uv sync --frozen --no-group dev --project /opt/standard-tooling
 ENV PATH="/opt/standard-tooling/.venv/bin:$PATH"
 
 EXPOSE 8000
