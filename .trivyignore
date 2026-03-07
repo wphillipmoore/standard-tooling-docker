@@ -85,6 +85,7 @@ CVE-2026-27699
 CVE-2026-27903
 CVE-2026-27904
 GHSA-qffp-2rhf-9h96
+CVE-2026-29786
 
 # Node.js CVEs — should be resolved by Node 22.22.0 upgrade. Listed
 # here as safety net in case Trivy DB still attributes them to copied
