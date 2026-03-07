@@ -10,6 +10,7 @@ repositories.
 
 - [Available Images](#available-images)
 - [Usage](#usage)
+  - [Documentation image](#documentation-image)
 - [Common Tooling](#common-tooling)
 - [Publishing](#publishing)
 - [Migration Note](#migration-note)
@@ -26,6 +27,7 @@ All images are published to GitHub Container Registry at
 | `dev-java`   | 17, 21           | `eclipse-temurin:<v>-jdk` |
 | `dev-go`     | 1.25, 1.26       | `golang:<v>`              |
 | `dev-rust`   | 1.92, 1.93       | `rust:<v>-slim`           |
+| `dev-docs`   | latest           | `python:3.14-slim`        |
 
 ## Usage
 
@@ -46,6 +48,41 @@ Build a single image:
 ```bash
 docker build --build-arg PYTHON_VERSION=3.14 -t dev-python:3.14 docker/python/
 ```
+
+### Documentation image
+
+The `dev-docs` image provides MkDocs Material and mike for documentation
+preview and versioned deploys. It is shared across all language repos since
+the docs stack is language-independent.
+
+Build locally:
+
+```bash
+docker build -t dev-docs:latest docker/docs/
+```
+
+Use via the `docker-docs` wrapper in standard-tooling:
+
+```bash
+docker-docs serve   # Live-reloading preview at http://localhost:8000
+docker-docs build   # Build static site (validation)
+```
+
+**Fragment prerequisites**: The wrapper automatically mounts a sibling
+`mq-rest-admin-common` clone into the container at `.mq-rest-admin-common`,
+matching the first `base_path` entry in all `mkdocs.yml` files.
+
+**Python repos**: When `pyproject.toml` is detected, the wrapper runs
+`uv sync --group docs` before mkdocs so that mkdocstrings and other
+Python-specific plugins are available.
+
+**Environment variables**:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `DOCKER_DOCS_IMAGE` | `dev-docs:latest` | Override Docker image |
+| `MKDOCS_CONFIG` | `docs/site/mkdocs.yml` | Path to mkdocs config |
+| `DOCS_PORT` | `8000` | Host port for serve |
 
 ## Common Tooling
 
@@ -76,7 +113,8 @@ write access because the packages were originally created by the
 2. Under **Manage Actions access**, click **Add Repository**.
 3. Select `standard-tooling-docker` and set the role to **Write**.
 
-This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`, `dev-rust`.
+This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`, `dev-rust`,
+`dev-docs`.
 
 ## Migration Note
 

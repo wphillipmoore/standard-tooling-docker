@@ -28,4 +28,7 @@ build go     go     GO_VERSION     1.26
 build rust   rust   RUST_VERSION   1.92
 build rust   rust   RUST_VERSION   1.93
 
+echo "Building dev-docs:latest ..."
+docker build -t "dev-docs:latest" "${script_dir}/docs"
+
 echo "All images built successfully."
