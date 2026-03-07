@@ -14,7 +14,7 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      curl \
+      git curl \
       pkg-config \
       xz-utils && \
     rm -rf /var/lib/apt/lists/*
@@ -47,5 +47,12 @@ RUN rustup component add clippy rustfmt llvm-tools
 RUN cargo install cargo-deny@0.19.0 && \
     cargo install cargo-llvm-cov@0.6.16 && \
     rm -rf /usr/local/cargo/registry
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+RUN uv python install 3.14
+
+RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /opt/standard-tooling \
+    && cd /opt/standard-tooling && uv sync --frozen --no-group dev --python 3.14
+ENV PATH="/opt/standard-tooling/.venv/bin:$PATH"
 
 WORKDIR /workspace
