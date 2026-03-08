@@ -36,6 +36,10 @@ ARG TAPLO_VERSION=0.10.0
 RUN curl -fsSL "https://github.com/tamasfe/taplo/releases/download/${TAPLO_VERSION}/taplo-linux-x86_64.gz" \
     | gunzip > /usr/local/bin/taplo && chmod +x /usr/local/bin/taplo
 
+ARG GH_VERSION=2.67.0
+RUN curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
+    | tar -xz --strip-components=2 -C /usr/local/bin/ "gh_${GH_VERSION}_linux_amd64/bin/gh"
+
 RUN pip install --no-cache-dir yamllint==1.38.0
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
