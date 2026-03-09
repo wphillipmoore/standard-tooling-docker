@@ -57,12 +57,8 @@ RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 &&
     go install github.com/vladopajic/go-test-coverage/v2@v2.18.3
 
 # --- standard-tooling --------------------------------------------------------
-RUN pip install --no-cache-dir --break-system-packages uv==0.7.12 && \
-    uv python install 3.14 && \
-    PYBIN=$(dirname $(uv python find 3.14)) && \
-    git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /tmp/standard-tooling && \
-    $PYBIN/pip install --no-cache-dir --break-system-packages /tmp/standard-tooling && \
-    ln -s $PYBIN/st-* /usr/local/bin/ && \
+RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /tmp/standard-tooling && \
+    pip install --no-cache-dir --break-system-packages /tmp/standard-tooling && \
     rm -rf /tmp/standard-tooling
 
 WORKDIR /workspace
