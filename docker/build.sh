@@ -7,7 +7,7 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 
 build() {
-  local lang="$1" version_arg="$3" version_val="$4"
+  local lang="$1" version_arg="$2" version_val="$3"
   echo "Building dev-${lang}:${version_val} ..."
   docker build \
     --build-arg "${version_arg}=${version_val}" \
@@ -15,18 +15,18 @@ build() {
     "${script_dir}/${lang}"
 }
 
-build ruby   ruby   RUBY_VERSION   3.2
-build ruby   ruby   RUBY_VERSION   3.3
-build ruby   ruby   RUBY_VERSION   3.4
-build python python PYTHON_VERSION 3.12
-build python python PYTHON_VERSION 3.13
-build python python PYTHON_VERSION 3.14
-build java   java   JDK_VERSION    17
-build java   java   JDK_VERSION    21
-build go     go     GO_VERSION     1.25
-build go     go     GO_VERSION     1.26
-build rust   rust   RUST_VERSION   1.92
-build rust   rust   RUST_VERSION   1.93
+build python PYTHON_VERSION 3.12
+build python PYTHON_VERSION 3.13
+build python PYTHON_VERSION 3.14
+build ruby   RUBY_VERSION   3.2
+build ruby   RUBY_VERSION   3.3
+build ruby   RUBY_VERSION   3.4
+build java   JDK_VERSION    17
+build java   JDK_VERSION    21
+build go     GO_VERSION     1.25
+build go     GO_VERSION     1.26
+build rust   RUST_VERSION   1.92
+build rust   RUST_VERSION   1.93
 
 echo "Building dev-docs:latest ..."
 docker build -t "dev-docs:latest" "${script_dir}/docs"
