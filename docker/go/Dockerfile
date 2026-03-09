@@ -57,11 +57,12 @@ RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1 &&
     go install github.com/vladopajic/go-test-coverage/v2@v2.18.3
 
 # --- standard-tooling --------------------------------------------------------
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
-RUN uv python install 3.14
-
-RUN git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /opt/standard-tooling \
-    && uv sync --frozen --no-group dev --python 3.14 --project /opt/standard-tooling
-ENV PATH="/opt/standard-tooling/.venv/bin:$PATH"
+RUN pip install --no-cache-dir --break-system-packages uv==0.7.12 && \
+    uv python install 3.14 && \
+    PYBIN=$(dirname $(uv python find 3.14)) && \
+    git clone --depth 1 -b develop https://github.com/wphillipmoore/standard-tooling.git /tmp/standard-tooling && \
+    $PYBIN/pip install --no-cache-dir --break-system-packages /tmp/standard-tooling && \
+    ln -s $PYBIN/st-* /usr/local/bin/ && \
+    rm -rf /tmp/standard-tooling
 
 WORKDIR /workspace
