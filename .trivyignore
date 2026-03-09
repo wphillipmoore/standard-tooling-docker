@@ -96,3 +96,9 @@ CVE-2025-55131
 CVE-2025-59465
 CVE-2025-59466
 CVE-2026-21637
+
+# GitHub CLI (gh) — docker/cli dependency. Windows-only privilege
+# escalation via malicious plugin binaries. Not applicable to Linux
+# containers.
+
+CVE-2025-15558
