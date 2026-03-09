@@ -35,114 +35,9 @@ jobs:
       - name: Run Hadolint
         run: hadolint docker/*/Dockerfile
 
-  # Phase 1: Python 3.14 — base image for all non-Python images.
-  publish-python-base:
-    name: "publish: dev-python:3.14"
-    needs: [hadolint]
-    runs-on: ubuntu-latest
-    env:
-      IMAGE: ghcr.io/wphillipmoore/dev-python:3.14
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg "PYTHON_VERSION=3.14" \
-            -t "$IMAGE" \
-            docker/python
-
-      - name: Trivy image scan
-        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.1
-        with:
-          scan-type: image
-          scan-ref: ${{ env.IMAGE }}
-          exit-code: "1"
-          sarif-category: trivy-image-python-3.14
-          trivyignores: .trivyignore
-
-      - name: Push image
-        run: docker push "$IMAGE"
-
-      - name: Get image digest
-        id: digest
-        run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ghcr.io/wphillipmoore/dev-python
-          subject-digest: ${{ steps.digest.outputs.digest }}
-
-  # Phase 2: Remaining Python versions (independent of Python 3.14).
-  publish-python-other:
-    name: "publish: dev-python:${{ matrix.version }}"
-    needs: [hadolint]
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - version: "3.12"
-          - version: "3.13"
-    env:
-      IMAGE: "ghcr.io/wphillipmoore/dev-python:${{ matrix.version }}"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg "PYTHON_VERSION=${{ matrix.version }}" \
-            -t "$IMAGE" \
-            docker/python
-
-      - name: Trivy image scan
-        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.1
-        with:
-          scan-type: image
-          scan-ref: ${{ env.IMAGE }}
-          exit-code: "1"
-          sarif-category: "trivy-image-python-${{ matrix.version }}"
-          trivyignores: .trivyignore
-
-      - name: Push image
-        run: docker push "$IMAGE"
-
-      - name: Get image digest
-        id: digest
-        run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-
-      - name: Attest build provenance
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ghcr.io/wphillipmoore/dev-python
-          subject-digest: ${{ steps.digest.outputs.digest }}
-
-  # Phase 2: Non-Python images (depend on dev-python:3.14 being published).
   build-scan-push:
     name: "publish: dev-${{ matrix.language }}:${{ matrix.version }}"
-    needs: [hadolint, publish-python-base]
+    needs: [hadolint]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -157,6 +52,15 @@ jobs:
           - language: ruby
             version: "3.4"
             build-arg: RUBY_VERSION
+          - language: python
+            version: "3.12"
+            build-arg: PYTHON_VERSION
+          - language: python
+            version: "3.13"
+            build-arg: PYTHON_VERSION
+          - language: python
+            version: "3.14"
+            build-arg: PYTHON_VERSION
           - language: java
             version: "17"
             build-arg: JDK_VERSION
@@ -224,7 +128,7 @@ jobs:
 
   publish-docs:
     name: "publish: dev-docs:latest"
-    needs: [hadolint, publish-python-base]
+    needs: [hadolint]
     runs-on: ubuntu-latest
     env:
       IMAGE: ghcr.io/wphillipmoore/dev-docs:latest
