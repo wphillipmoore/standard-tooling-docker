@@ -21,11 +21,11 @@ All language images include:
 | git              | latest  | Repository operations          |
 | curl             | latest  | HTTP requests                  |
 
-The `dev-docs` image includes Node.js, markdownlint-cli, gh, git,
-standard-tooling, and curl but omits the validation tools (shellcheck,
-shfmt, actionlint, git-cliff).
+The `dev-base` image includes the full common layer plus documentation
+tooling (MkDocs Material, mike). It is the fallback image for repos
+with no detected language.
 
-Images that include Python (dev-python, dev-docs) also have:
+Images that include Python (dev-python, dev-base) also have:
 
 | Tool     | Version | Purpose         |
 | -------- | ------- | --------------- |
@@ -87,10 +87,14 @@ are pre-installed.
 | cargo-deny     | 0.18.2           | Dependency security checker |
 | cargo-llvm-cov | 0.6.16           | Code coverage               |
 
-## Docs
+## Base
 
 **Base**: `python:3.14-slim`
 **Version**: latest
+
+The base image includes the full common layer (all tools listed above)
+plus documentation tooling. It is the fallback image used by
+`st-docker-run` when no language is detected.
 
 | Tool             | Version | Purpose                    |
 | ---------------- | ------- | -------------------------- |

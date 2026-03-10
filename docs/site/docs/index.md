@@ -23,7 +23,7 @@ All images are published to
 | Go       | 1.25, 1.26       | `dev-go`     |
 | Java     | 17, 21           | `dev-java`   |
 | Rust     | 1.92, 1.93       | `dev-rust`   |
-| Docs     | latest           | `dev-docs`   |
+| Base     | latest           | `dev-base`   |
 
 See [Images](images/index.md) for per-language tool details.
 

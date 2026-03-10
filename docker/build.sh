@@ -34,8 +34,8 @@ build go     GO_VERSION     1.26
 build rust   RUST_VERSION   1.92
 build rust   RUST_VERSION   1.93
 
-"${script_dir}/generate.sh" docs
-echo "Building dev-docs:latest ..."
-docker build -t "dev-docs:latest" "${script_dir}/docs"
+"${script_dir}/generate.sh" base
+echo "Building dev-base:latest ..."
+docker build -t "dev-base:latest" "${script_dir}/base"
 
 echo "All images built successfully."
