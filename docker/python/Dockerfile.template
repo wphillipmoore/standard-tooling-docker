@@ -1,0 +1,23 @@
+# Generated from Dockerfile.template — DO NOT EDIT the Dockerfile directly.
+# Canonical source: https://github.com/wphillipmoore/standard-tooling-docker
+ARG PYTHON_VERSION=3.14
+FROM python:${PYTHON_VERSION}-slim
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# --- System packages ---------------------------------------------------------
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+      git curl xz-utils gnupg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# @include common/node-markdownlint.dockerfile
+# @include common/github-cli.dockerfile
+# @include common/validation-tools.dockerfile
+
+# --- Python tools via pip ----------------------------------------------------
+RUN pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
+
+# @include common/standard-tooling-uv.dockerfile
+
+WORKDIR /workspace

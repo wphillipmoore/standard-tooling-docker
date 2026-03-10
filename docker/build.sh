@@ -2,12 +2,18 @@
 # Managed by standard-tooling-docker — DO NOT EDIT in downstream repos.
 # Canonical source: https://github.com/wphillipmoore/standard-tooling-docker
 # build.sh — build all dev container images with default version tags.
+#
+# Each image is defined by a Dockerfile.template that may contain
+# "# @include common/<fragment>.dockerfile" lines.  generate.sh
+# expands these includes to produce the final Dockerfile before
+# each build.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 
 build() {
   local lang="$1" version_arg="$2" version_val="$3"
+  "${script_dir}/generate.sh" "$lang"
   echo "Building dev-${lang}:${version_val} ..."
   docker build \
     --build-arg "${version_arg}=${version_val}" \
@@ -28,6 +34,7 @@ build go     GO_VERSION     1.26
 build rust   RUST_VERSION   1.92
 build rust   RUST_VERSION   1.93
 
+"${script_dir}/generate.sh" docs
 echo "Building dev-docs:latest ..."
 docker build -t "dev-docs:latest" "${script_dir}/docs"
 

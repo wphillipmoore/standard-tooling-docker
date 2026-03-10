@@ -31,6 +31,9 @@ jobs:
             -o /usr/local/bin/hadolint
           chmod +x /usr/local/bin/hadolint
 
+      - name: Generate Dockerfiles from templates
+        run: docker/generate.sh
+
       - name: Run Hadolint
         run: hadolint docker/*/Dockerfile
 
@@ -42,7 +45,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run ShellCheck
-        run: shellcheck docker/build.sh
+        run: shellcheck docker/build.sh docker/generate.sh
 
   markdownlint:
     name: "ci: markdownlint"

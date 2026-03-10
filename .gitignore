@@ -8,3 +8,6 @@ Thumbs.db
 .env.*
 *.log
 trivy-out.json
+
+# Generated Dockerfiles — source of truth is Dockerfile.template
+docker/*/Dockerfile
