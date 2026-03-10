@@ -4,41 +4,16 @@
 # build.sh — build all dev container images with default version tags.
 #
 # Each image is defined by a Dockerfile.template that may contain
-# "# @include common/<fragment>.dockerfile" lines.  The generate()
-# function expands these includes to produce the final Dockerfile
-# before each build.
+# "# @include common/<fragment>.dockerfile" lines.  generate.sh
+# expands these includes to produce the final Dockerfile before
+# each build.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 
-generate() {
-  local lang="$1"
-  local template="${script_dir}/${lang}/Dockerfile.template"
-  local output="${script_dir}/${lang}/Dockerfile"
-
-  if [[ ! -f "$template" ]]; then
-    echo "ERROR: template not found: ${template}" >&2
-    return 1
-  fi
-
-  # Expand # @include directives by replacing each line with file contents
-  while IFS= read -r line; do
-    if [[ "$line" =~ ^#\ @include\ (.+)$ ]]; then
-      local fragment="${script_dir}/${BASH_REMATCH[1]}"
-      if [[ ! -f "$fragment" ]]; then
-        echo "ERROR: fragment not found: ${fragment}" >&2
-        return 1
-      fi
-      cat "$fragment"
-    else
-      printf '%s\n' "$line"
-    fi
-  done < "$template" > "$output"
-}
-
 build() {
   local lang="$1" version_arg="$2" version_val="$3"
-  generate "$lang"
+  "${script_dir}/generate.sh" "$lang"
   echo "Building dev-${lang}:${version_val} ..."
   docker build \
     --build-arg "${version_arg}=${version_val}" \
@@ -59,7 +34,7 @@ build go     GO_VERSION     1.26
 build rust   RUST_VERSION   1.92
 build rust   RUST_VERSION   1.93
 
-generate docs
+"${script_dir}/generate.sh" docs
 echo "Building dev-docs:latest ..."
 docker build -t "dev-docs:latest" "${script_dir}/docs"
 
