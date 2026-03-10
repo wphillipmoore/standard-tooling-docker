@@ -10,7 +10,7 @@ repositories.
 
 - [Available Images](#available-images)
 - [Usage](#usage)
-  - [Documentation image](#documentation-image)
+  - [Base image](#base-image)
 - [Common Tooling](#common-tooling)
 - [Build System](#build-system)
 - [Publishing](#publishing)
@@ -28,7 +28,7 @@ All images are published to GitHub Container Registry at
 | `dev-java`   | 17, 21           | `eclipse-temurin:<v>-jdk` |
 | `dev-go`     | 1.25, 1.26       | `golang:<v>`              |
 | `dev-rust`   | 1.92, 1.93       | `rust:<v>-slim`           |
-| `dev-docs`   | latest           | `python:3.14-slim`        |
+| `dev-base`   | latest           | `python:3.14-slim` (base) |
 
 ## Usage
 
@@ -52,17 +52,18 @@ docker build --build-arg PYTHON_VERSION=3.14 \
   -t dev-python:3.14 docker/python/
 ```
 
-### Documentation image
+### Base image
 
-The `dev-docs` image provides MkDocs Material and mike for documentation
-preview and versioned deploys. It is shared across all language repos
-since the docs stack is language-independent.
+The `dev-base` image includes all common tooling plus MkDocs Material
+and mike for documentation. It is the fallback image used by
+`st-docker-run` when no language is detected, and is shared across all
+repos for documentation builds.
 
 Build locally:
 
 ```bash
-docker/generate.sh docs
-docker build -t dev-docs:latest docker/docs/
+docker/generate.sh base
+docker build -t dev-base:latest docker/base/
 ```
 
 Use via the `docker-docs` wrapper in standard-tooling:
@@ -85,7 +86,7 @@ Python-specific plugins are available.
 
 | Variable             | Default                | Description           |
 | -------------------- | ---------------------- | --------------------- |
-| `DOCKER_DOCS_IMAGE`  | `dev-docs:latest`      | Override Docker image |
+| `DOCKER_DOCS_IMAGE`  | `dev-base:latest`      | Override Docker image |
 | `MKDOCS_CONFIG`      | `docs/site/mkdocs.yml` | Path to mkdocs config |
 | `DOCS_PORT`          | `8000`                 | Host port for serve   |
 
@@ -102,8 +103,9 @@ Every language image includes:
 - **git-cliff** 2.8.0
 - **standard-tooling** (`st-*` CLI commands)
 
-The `dev-docs` image includes Node.js, markdownlint-cli, GitHub CLI, and
-standard-tooling but omits the validation binary tools.
+The `dev-base` image includes the full common layer plus documentation
+tooling (MkDocs Material, mike). It is the fallback image for repos
+with no detected language.
 
 ## Build System
 
@@ -136,7 +138,7 @@ the `standard-tooling` repository:
 3. Select `standard-tooling-docker` and set the role to **Write**.
 
 This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`,
-`dev-rust`, `dev-docs`.
+`dev-rust`, `dev-base`.
 
 ## Migration Note
 

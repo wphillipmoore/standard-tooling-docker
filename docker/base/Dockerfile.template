@@ -1,6 +1,7 @@
 # Generated from Dockerfile.template — DO NOT EDIT the Dockerfile directly.
 # Canonical source: https://github.com/wphillipmoore/standard-tooling-docker
-# dev-docs — MkDocs Material + mike for documentation preview and build.
+# dev-base — Base dev container with all common tooling. Language-specific
+# images extend this with runtime and language-specific tools.
 FROM python:3.14-slim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -8,19 +9,22 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      git curl gnupg ca-certificates && \
+      git curl xz-utils gnupg ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 # @include common/node-markdownlint.dockerfile
 # @include common/github-cli.dockerfile
+# @include common/validation-tools.dockerfile
+
+# --- Python tools ------------------------------------------------------------
+RUN pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
 
 # --- MkDocs ------------------------------------------------------------------
 ARG MKDOCS_MATERIAL_VERSION=9.6.12
 ARG MIKE_VERSION=2.1.3
 RUN pip install --no-cache-dir \
       "mkdocs-material==${MKDOCS_MATERIAL_VERSION}" \
-      "mike==${MIKE_VERSION}" \
-      uv==0.7.12
+      "mike==${MIKE_VERSION}"
 
 # @include common/standard-tooling-uv.dockerfile
 

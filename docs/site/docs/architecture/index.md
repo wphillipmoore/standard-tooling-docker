@@ -60,9 +60,9 @@ Every language image includes the following shared fragments:
   for `st-*` CLI commands. Python-based images use the `uv` variant;
   others use `pip`.
 
-The `dev-docs` image includes `node-markdownlint`, `github-cli`, and
-`standard-tooling` but omits `validation-tools` (no shellcheck, shfmt,
-actionlint, or git-cliff).
+The `dev-base` image includes all common fragments plus documentation
+tooling (MkDocs Material, mike). It is the fallback image for repos
+with no detected language.
 
 ## Design Principles
 
@@ -104,7 +104,7 @@ repository, so that repo has implicit write access. This repo does not,
 unless manually configured.
 
 Per-package setup (one-time, for each of `dev-python`, `dev-java`,
-`dev-go`, `dev-ruby`, `dev-rust`, `dev-docs`):
+`dev-go`, `dev-ruby`, `dev-rust`, `dev-base`):
 
 1. Navigate to the package settings page on GHCR.
 2. Under **Manage Actions access**, click **Add Repository**.

@@ -6,7 +6,7 @@
 #
 # Usage:
 #   docker/generate.sh              # generate all
-#   docker/generate.sh python docs  # generate specific images
+#   docker/generate.sh python base  # generate specific images
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -36,7 +36,7 @@ generate() {
 }
 
 if [[ $# -eq 0 ]]; then
-  langs=(python go rust java ruby docs)
+  langs=(python go rust java ruby base)
 else
   langs=("$@")
 fi
