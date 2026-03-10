@@ -101,6 +101,7 @@ Every language image includes:
 - **shfmt** 3.12.0
 - **actionlint** 1.7.11
 - **git-cliff** 2.8.0
+- **openssh-client** (SSH for git remote operations)
 - **standard-tooling** (`st-*` CLI commands)
 
 The `dev-base` image includes the full common layer plus documentation
