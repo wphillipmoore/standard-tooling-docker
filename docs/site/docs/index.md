@@ -1,19 +1,20 @@
 # Standard Tooling Docker
 
 Docker dev container images for the
-[standard-tooling](https://github.com/wphillipmoore/standard-tooling) ecosystem.
+[standard-tooling](https://github.com/wphillipmoore/standard-tooling)
+ecosystem.
 
 ## Overview
 
-This repository maintains language-specific dev container images published to
-GitHub Container Registry (GHCR). Each image bundles the language runtime,
-package manager, and a common tooling layer (Node.js, ShellCheck,
-markdownlint-cli) so that CI pipelines and local development share the same
-environment.
+This repository maintains language-specific dev container images published
+to GitHub Container Registry (GHCR). Each image bundles the language
+runtime, package manager, and a common tooling layer so that CI pipelines
+and local development share the same environment.
 
 ## Images
 
-All images are published to `ghcr.io/wphillipmoore/dev-<language>:<version>`.
+All images are published to
+`ghcr.io/wphillipmoore/dev-<language>:<version>`.
 
 | Language | Versions         | Image        |
 | -------- | ---------------- | ------------ |
@@ -22,6 +23,7 @@ All images are published to `ghcr.io/wphillipmoore/dev-<language>:<version>`.
 | Go       | 1.25, 1.26       | `dev-go`     |
 | Java     | 17, 21           | `dev-java`   |
 | Rust     | 1.92, 1.93       | `dev-rust`   |
+| Docs     | latest           | `dev-docs`   |
 
 See [Images](images/index.md) for per-language tool details.
 
@@ -40,9 +42,10 @@ cd standard-tooling-docker
 docker/build.sh
 ```
 
-This builds all 14 images and tags them as `dev-<language>:<version>`.
+This builds all images and tags them as `dev-<language>:<version>`.
 
 ## Further Reading
 
 - [Images](images/index.md) — per-language tooling and versions
-- [Architecture](architecture/index.md) — build strategy and common layer design
+- [Architecture](architecture/index.md) — build strategy, templating,
+  and common layer design

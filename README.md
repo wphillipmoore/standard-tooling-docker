@@ -1,9 +1,9 @@
 # standard-tooling-docker
 
 Docker dev container images for the
-[standard-tooling](https://github.com/wphillipmoore/standard-tooling) ecosystem.
-Each image provides a language runtime plus shared tooling (Node.js, ShellCheck,
-markdownlint) used by CI and local Docker-first development across all managed
+[standard-tooling](https://github.com/wphillipmoore/standard-tooling)
+ecosystem. Each image provides a language runtime plus shared tooling
+used by CI and local Docker-first development across all managed
 repositories.
 
 ## Table of Contents
@@ -12,6 +12,7 @@ repositories.
 - [Usage](#usage)
   - [Documentation image](#documentation-image)
 - [Common Tooling](#common-tooling)
+- [Build System](#build-system)
 - [Publishing](#publishing)
 - [Migration Note](#migration-note)
 
@@ -46,18 +47,21 @@ docker/build.sh
 Build a single image:
 
 ```bash
-docker build --build-arg PYTHON_VERSION=3.14 -t dev-python:3.14 docker/python/
+docker/generate.sh python
+docker build --build-arg PYTHON_VERSION=3.14 \
+  -t dev-python:3.14 docker/python/
 ```
 
 ### Documentation image
 
 The `dev-docs` image provides MkDocs Material and mike for documentation
-preview and versioned deploys. It is shared across all language repos since
-the docs stack is language-independent.
+preview and versioned deploys. It is shared across all language repos
+since the docs stack is language-independent.
 
 Build locally:
 
 ```bash
+docker/generate.sh docs
 docker build -t dev-docs:latest docker/docs/
 ```
 
@@ -69,8 +73,9 @@ docker-docs build   # Build static site (validation)
 ```
 
 **Fragment prerequisites**: The wrapper automatically mounts a sibling
-`mq-rest-admin-common` clone into the container at `.mq-rest-admin-common`,
-matching the first `base_path` entry in all `mkdocs.yml` files.
+`mq-rest-admin-common` clone into the container at
+`.mq-rest-admin-common`, matching the first `base_path` entry in all
+`mkdocs.yml` files.
 
 **Python repos**: When `pyproject.toml` is detected, the wrapper runs
 `uv sync --group docs` before mkdocs so that mkdocstrings and other
@@ -78,25 +83,42 @@ Python-specific plugins are available.
 
 **Environment variables**:
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `DOCKER_DOCS_IMAGE` | `dev-docs:latest` | Override Docker image |
-| `MKDOCS_CONFIG` | `docs/site/mkdocs.yml` | Path to mkdocs config |
-| `DOCS_PORT` | `8000` | Host port for serve |
+| Variable             | Default                | Description           |
+| -------------------- | ---------------------- | --------------------- |
+| `DOCKER_DOCS_IMAGE`  | `dev-docs:latest`      | Override Docker image |
+| `MKDOCS_CONFIG`      | `docs/site/mkdocs.yml` | Path to mkdocs config |
+| `DOCS_PORT`          | `8000`                 | Host port for serve   |
 
 ## Common Tooling
 
-Every image includes:
+Every language image includes:
 
-- **Node.js** 22.22.0 (multi-stage copy)
-- **ShellCheck** 0.11.0
+- **Node.js** 22 (via NodeSource apt repo)
 - **markdownlint-cli** 0.47.0
-- Language-specific package manager and linting tools
+- **GitHub CLI** (gh) via official apt repo
+- **ShellCheck** 0.11.0
+- **shfmt** 3.12.0
+- **actionlint** 1.7.11
+- **git-cliff** 2.8.0
+- **standard-tooling** (`st-*` CLI commands)
+
+The `dev-docs` image includes Node.js, markdownlint-cli, GitHub CLI, and
+standard-tooling but omits the validation binary tools.
+
+## Build System
+
+Images are built from `Dockerfile.template` files using a fragment
+inclusion system. Shared tooling installations are maintained once in
+`docker/common/` and included via `# @include` directives. `generate.sh`
+expands templates into final Dockerfiles before each build.
+
+See [Architecture](https://wphillipmoore.github.io/standard-tooling-docker/architecture/)
+for details.
 
 ## Publishing
 
-Images are published automatically on push to `develop` or `main` via the
-`docker-publish.yml` workflow. Manual rebuilds can be triggered via
+Images are published automatically on push to `develop` or `main` via
+the `docker-publish.yml` workflow. Manual rebuilds can be triggered via
 `workflow_dispatch` in the Actions tab.
 
 Image URLs use the user namespace (`ghcr.io/wphillipmoore/...`), not a
@@ -104,21 +126,22 @@ repo-specific namespace, so paths remain stable across repo migrations.
 
 ### GHCR access prerequisites
 
-The workflow authenticates with `GITHUB_TOKEN` (`packages: write`). No PAT
-or additional secret is needed. Each GHCR package must grant this repository
-write access because the packages were originally created by the
-`standard-tooling` repository:
+The workflow authenticates with `GITHUB_TOKEN` (`packages: write`). No
+PAT or additional secret is needed. Each GHCR package must grant this
+repository write access because the packages were originally created by
+the `standard-tooling` repository:
 
 1. Go to the package settings page on GHCR for each `dev-*` package.
 2. Under **Manage Actions access**, click **Add Repository**.
 3. Select `standard-tooling-docker` and set the role to **Write**.
 
-This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`, `dev-rust`,
-`dev-docs`.
+This applies to: `dev-python`, `dev-java`, `dev-go`, `dev-ruby`,
+`dev-rust`, `dev-docs`.
 
 ## Migration Note
 
 These images were originally maintained in the
-[standard-tooling](https://github.com/wphillipmoore/standard-tooling) repository
-under `docker/`. They were split into this dedicated repository to provide an
-independent release lifecycle and clearer separation of concerns.
+[standard-tooling](https://github.com/wphillipmoore/standard-tooling)
+repository under `docker/`. They were split into this dedicated
+repository to provide an independent release lifecycle and clearer
+separation of concerns.

@@ -1,29 +1,48 @@
 # Images
 
-Every image shares a common tooling layer and adds language-specific runtimes
-and tools. Images are published to
+Every image shares a common tooling layer and adds language-specific
+runtimes and tools. Images are published to
 `ghcr.io/wphillipmoore/dev-<language>:<version>`.
 
 ## Common Layer
 
-All images include:
+All language images include:
 
-| Tool             | Version | Purpose                      |
-| ---------------- | ------- | ---------------------------- |
-| Node.js          | 22.22.0 | Runtime for markdownlint-cli |
-| ShellCheck       | 0.11.0  | Shell script linting         |
-| markdownlint-cli | 0.47.0  | Markdown linting             |
-| git              | latest  | Repository operations        |
-| curl             | latest  | HTTP requests                |
+| Tool             | Version | Purpose                        |
+| ---------------- | ------- | ------------------------------ |
+| Node.js          | 22      | Runtime for markdownlint-cli   |
+| markdownlint-cli | 0.47.0  | Markdown linting               |
+| gh (GitHub CLI)  | latest  | GitHub API and workflows       |
+| shellcheck       | 0.11.0  | Shell script linting           |
+| shfmt            | 3.12.0  | Shell script formatting        |
+| actionlint       | 1.7.11  | GitHub Actions linting         |
+| git-cliff        | 2.8.0   | Changelog generation           |
+| standard-tooling | develop | `st-*` CLI commands            |
+| git              | latest  | Repository operations          |
+| curl             | latest  | HTTP requests                  |
+
+The `dev-docs` image includes Node.js, markdownlint-cli, gh, git,
+standard-tooling, and curl but omits the validation tools (shellcheck,
+shfmt, actionlint, git-cliff).
+
+Images that include Python (dev-python, dev-docs) also have:
+
+| Tool     | Version | Purpose         |
+| -------- | ------- | --------------- |
+| yamllint | 1.38.0  | YAML linting    |
+| uv       | 0.7.12  | Package manager |
+
+Non-Python images that need YAML linting install Python and yamllint via
+the `python-support` fragment.
 
 ## Python
 
 **Base**: `python:<version>-slim`
 **Versions**: 3.12, 3.13, 3.14
 
-| Tool | Source                        | Purpose                |
-| ---- | ----------------------------- | ---------------------- |
-| uv   | `ghcr.io/astral-sh/uv:latest` | Python package manager |
+| Tool | Version | Purpose                |
+| ---- | ------- | ---------------------- |
+| uv   | 0.7.12  | Python package manager |
 
 ## Ruby
 
@@ -52,8 +71,8 @@ All images include:
 **Versions**: 17, 21
 
 Java images rely on the consuming repository's Maven wrapper (`mvnw`) to
-bootstrap Maven at container startup. No additional Java-specific tools are
-pre-installed.
+bootstrap Maven at container startup. No additional Java-specific tools
+are pre-installed.
 
 ## Rust
 
@@ -67,3 +86,14 @@ pre-installed.
 | llvm-tools     | rustup component | Coverage instrumentation    |
 | cargo-deny     | 0.18.2           | Dependency security checker |
 | cargo-llvm-cov | 0.6.16           | Code coverage               |
+
+## Docs
+
+**Base**: `python:3.14-slim`
+**Version**: latest
+
+| Tool             | Version | Purpose                    |
+| ---------------- | ------- | -------------------------- |
+| MkDocs Material  | 9.6.12  | Documentation site builder |
+| mike             | 2.1.3   | Versioned doc deployment   |
+| uv               | 0.7.12  | Package manager            |
