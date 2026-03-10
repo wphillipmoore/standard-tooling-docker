@@ -19,6 +19,7 @@ All language images include:
 | git-cliff        | 2.8.0   | Changelog generation           |
 | standard-tooling | develop | `st-*` CLI commands            |
 | git              | latest  | Repository operations          |
+| openssh-client   | latest  | SSH for git remote operations  |
 | curl             | latest  | HTTP requests                  |
 
 The `dev-base` image includes the full common layer plus documentation
