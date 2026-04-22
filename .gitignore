@@ -11,3 +11,6 @@ trivy-out.json
 
 # Generated Dockerfiles — source of truth is Dockerfile.template
 docker/*/Dockerfile
+
+# Parallel AI agent worktrees (see CLAUDE.md)
+.worktrees/
