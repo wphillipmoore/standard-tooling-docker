@@ -6,6 +6,12 @@ on:
       - develop
       - main
   workflow_dispatch:
+  # Triggered by `standard-tooling`'s release pipeline after each release
+  # so the dev images rebuild against the freshly-tagged rolling-minor
+  # version. Ties image freshness to release cadence rather than to
+  # standard-tooling-docker's own merge cadence. Issue #51.
+  repository_dispatch:
+    types: [standard-tooling-released]
 
 permissions:
   packages: write
