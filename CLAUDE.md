@@ -99,11 +99,16 @@ Docker-first development across all managed repositories.
 ### Environment Setup
 
 ```bash
-cd ../standard-tooling && uv sync              # Install standard-tooling
-export PATH="../standard-tooling/.venv/bin\
-:../standard-tooling/scripts/bin:$PATH"        # Put tools on PATH
-git config core.hooksPath \
-  ../standard-tooling/scripts/lib/git-hooks    # Enable git hooks
+# Host-installed standard-tooling provides st-* commands on PATH.
+# Install per the host-level-tool spec
+# (https://github.com/wphillipmoore/standard-tooling/blob/develop/docs/specs/host-level-tool.md):
+uv tool install 'standard-tooling @ git+https://github.com/wphillipmoore/standard-tooling@v1.3'
+# (or `pip install` into the same Python env that hosts `uv`).
+
+# Enable the pre-commit gate (refuses raw `git commit`; admits
+# st-commit). The gate is vendored at `.githooks/pre-commit` in
+# this repo.
+git config core.hooksPath .githooks
 ```
 
 ### Validation
