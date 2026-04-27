@@ -17,7 +17,10 @@ RUN apt-get update && \
 # @include common/validation-tools.dockerfile
 
 # --- Python tools ------------------------------------------------------------
-RUN pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
+# Upgrade system pip past CVE-2026-3219 (TAR/ZIP polyglot in archive
+# parsing). pip 26.0.1 is affected; 26.1 is the fix. Issue #59.
+RUN pip install --no-cache-dir --upgrade 'pip>=26.1' && \
+    pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
 
 # --- MkDocs ------------------------------------------------------------------
 ARG MKDOCS_MATERIAL_VERSION=9.6.12
