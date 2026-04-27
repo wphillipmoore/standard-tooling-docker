@@ -21,12 +21,12 @@ docker/
 │   ├── standard-tooling-pip.dockerfile
 │   ├── standard-tooling-uv.dockerfile
 │   └── validation-tools.dockerfile
+├── base/Dockerfile.template
 ├── python/Dockerfile.template
 ├── ruby/Dockerfile.template
 ├── go/Dockerfile.template
 ├── java/Dockerfile.template
-├── rust/Dockerfile.template
-└── docs/Dockerfile.template
+└── rust/Dockerfile.template
 ```
 
 ### Templating
@@ -55,10 +55,15 @@ Every language image includes the following shared fragments:
 - **`github-cli.dockerfile`** — GitHub CLI via the official apt repo.
 - **`validation-tools.dockerfile`** — Binary installs of shellcheck,
   shfmt, actionlint, and git-cliff.
+- **`python-support.dockerfile`** — Minimal Python plus yamllint, used
+  by non-Python images that still need YAML linting.
 - **`standard-tooling-*.dockerfile`** — Clones and installs
   [standard-tooling](https://github.com/wphillipmoore/standard-tooling)
-  for `st-*` CLI commands. Python-based images use the `uv` variant;
-  others use `pip`.
+  for `st-*` CLI commands. The image is pinned to the rolling minor
+  tag (currently `v1.3`); a `repository_dispatch` from
+  `standard-tooling`'s release pipeline rebuilds the image on every
+  patch release. Python-based images use the `uv` variant; others
+  use `pip`.
 
 The `dev-base` image includes all common fragments plus documentation
 tooling (MkDocs Material, mike). It is the fallback image for repos
