@@ -857,12 +857,12 @@
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── standard-tooling-pip.dockerfile
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── standard-tooling-uv.dockerfile
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   └── validation-tools.dockerfile
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── python/Dockerfile.template
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── ruby/Dockerfile.template
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── go/Dockerfile.template
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├── java/Dockerfile.template
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>├── rust/Dockerfile.template
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>└── docs/Dockerfile.template
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── base/Dockerfile.template
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── python/Dockerfile.template
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── ruby/Dockerfile.template
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├── go/Dockerfile.template
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>├── java/Dockerfile.template
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>└── rust/Dockerfile.template
 </code></pre></div>
 <h3 id="templating">Templating<a class="headerlink" href="#templating" title="Permanent link">&para;</a></h3>
 <p>Each <code>Dockerfile.template</code> contains standard Dockerfile instructions plus
@@ -884,10 +884,15 @@ all images automatically at build time.</p>
 <li><strong><code>github-cli.dockerfile</code></strong> — GitHub CLI via the official apt repo.</li>
 <li><strong><code>validation-tools.dockerfile</code></strong> — Binary installs of shellcheck,
   shfmt, actionlint, and git-cliff.</li>
+<li><strong><code>python-support.dockerfile</code></strong> — Minimal Python plus yamllint, used
+  by non-Python images that still need YAML linting.</li>
 <li><strong><code>standard-tooling-*.dockerfile</code></strong> — Clones and installs
   <a href="https://github.com/wphillipmoore/standard-tooling">standard-tooling</a>
-  for <code>st-*</code> CLI commands. Python-based images use the <code>uv</code> variant;
-  others use <code>pip</code>.</li>
+  for <code>st-*</code> CLI commands. The image is pinned to the rolling minor
+  tag (currently <code>v1.3</code>); a <code>repository_dispatch</code> from
+  <code>standard-tooling</code>'s release pipeline rebuilds the image on every
+  patch release. Python-based images use the <code>uv</code> variant; others
+  use <code>pip</code>.</li>
 </ul>
 <p>The <code>dev-base</code> image includes all common fragments plus documentation
 tooling (MkDocs Material, mike). It is the fallback image for repos
