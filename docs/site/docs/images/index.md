@@ -17,7 +17,7 @@ All language images include:
 | shfmt            | 3.12.0  | Shell script formatting        |
 | actionlint       | 1.7.11  | GitHub Actions linting         |
 | git-cliff        | 2.8.0   | Changelog generation           |
-| standard-tooling | develop | `st-*` CLI commands            |
+| standard-tooling | v1.3    | `st-*` CLI commands (rolling)  |
 | git              | latest  | Repository operations          |
 | openssh-client   | latest  | SSH for git remote operations  |
 | curl             | latest  | HTTP requests                  |
@@ -59,12 +59,14 @@ the `python-support` fragment.
 **Base**: `golang:<version>`
 **Versions**: 1.25, 1.26
 
-| Tool          | Version | Purpose               |
-| ------------- | ------- | --------------------- |
-| golangci-lint | 2.10.1  | Go linter aggregator  |
-| govulncheck   | 1.1.4   | Vulnerability scanner |
-| go-licenses   | 2.0.1   | License checker       |
-| gocyclo       | 0.6.0   | Cyclomatic complexity |
+| Tool             | Version | Purpose               |
+| ---------------- | ------- | --------------------- |
+| golangci-lint    | 2.10.1  | Go linter aggregator  |
+| govulncheck      | 1.1.4   | Vulnerability scanner |
+| go-licenses      | 2.0.1   | License checker       |
+| gocyclo          | 0.6.0   | Cyclomatic complexity |
+| goimports        | 0.42.0  | Import formatter      |
+| go-test-coverage | 2.18.3  | Coverage thresholds   |
 
 ## Java
 
@@ -85,7 +87,7 @@ are pre-installed.
 | clippy         | rustup component | Rust linter                 |
 | rustfmt        | rustup component | Code formatter              |
 | llvm-tools     | rustup component | Coverage instrumentation    |
-| cargo-deny     | 0.18.2           | Dependency security checker |
+| cargo-deny     | 0.19.0           | Dependency security checker |
 | cargo-llvm-cov | 0.6.16           | Code coverage               |
 
 ## Base
