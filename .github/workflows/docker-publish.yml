@@ -91,6 +91,11 @@ jobs:
 
     env:
       IMAGE: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}:${{ matrix.version }}"
+      # Local-only tag scanned by Trivy. Using the GHCR-namespaced tag
+      # would cause Trivy to pull the already-published :latest from the
+      # registry instead of scanning the freshly-built local image. See
+      # issue #55.
+      CANDIDATE: "dev-${{ matrix.language }}-candidate:${{ matrix.version }}"
 
     steps:
       - name: Checkout code
@@ -110,20 +115,21 @@ jobs:
         run: |
           docker build \
             --build-arg "${{ matrix.build-arg }}=${{ matrix.version }}" \
-            -t "$IMAGE" \
+            -t "$CANDIDATE" \
             "docker/${{ matrix.language }}"
 
       - name: Trivy image scan
         uses: wphillipmoore/standard-actions/actions/security/trivy@v1.1
         with:
           scan-type: image
-          scan-ref: ${{ env.IMAGE }}
+          scan-ref: ${{ env.CANDIDATE }}
           exit-code: "1"
           sarif-category: "trivy-image-${{ matrix.language }}-${{ matrix.version }}"
           trivyignores: .trivyignore
 
-      - name: Push image
+      - name: Tag and push image
         run: |
+          docker tag "$CANDIDATE" "$IMAGE"
           docker push "$IMAGE"
 
       - name: Get image digest
@@ -144,6 +150,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE: ghcr.io/wphillipmoore/dev-base:latest
+      # Local-only tag scanned by Trivy. See issue #55.
+      CANDIDATE: dev-base-candidate:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -159,19 +167,21 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        run: docker build -t "$IMAGE" docker/base
+        run: docker build -t "$CANDIDATE" docker/base
 
       - name: Trivy image scan
         uses: wphillipmoore/standard-actions/actions/security/trivy@v1.1
         with:
           scan-type: image
-          scan-ref: ${{ env.IMAGE }}
+          scan-ref: ${{ env.CANDIDATE }}
           exit-code: "1"
           sarif-category: trivy-image-base
           trivyignores: .trivyignore
 
-      - name: Push image
-        run: docker push "$IMAGE"
+      - name: Tag and push image
+        run: |
+          docker tag "$CANDIDATE" "$IMAGE"
+          docker push "$IMAGE"
 
       - name: Get image digest
         id: digest
