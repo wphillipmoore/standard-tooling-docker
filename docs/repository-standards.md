@@ -45,7 +45,7 @@
 Hard gates (required status checks on `develop`):
 
 - Hadolint: lint all Dockerfiles
-- ShellCheck: lint `docker/build.sh`
+- ShellCheck: lint `docker/build.sh` and `docker/generate.sh`
 - Markdownlint: lint all Markdown files
 - Standards compliance:
   - Repository profile validation (`repo-profile`)
