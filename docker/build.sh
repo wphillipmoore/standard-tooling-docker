@@ -7,6 +7,10 @@
 # "# @include common/<fragment>.dockerfile" lines.  generate.sh
 # expands these includes to produce the final Dockerfile before
 # each build.
+#
+# After a successful build, dangling images and stale build cache
+# (>30 days) are pruned to prevent local disk bloat.  Tagged images
+# and volumes are never touched.
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
@@ -39,3 +43,7 @@ echo "Building dev-base:latest ..."
 docker build -t "dev-base:latest" "${script_dir}/base"
 
 echo "All images built successfully."
+
+echo "Pruning dangling images and stale build cache ..."
+docker image prune -f
+docker builder prune -af --filter 'until=720h'
