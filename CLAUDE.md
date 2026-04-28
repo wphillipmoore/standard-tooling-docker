@@ -111,8 +111,9 @@ git config core.hooksPath .githooks
 ### Validation
 
 ```bash
+docker/generate.sh              # Expand templates (required before hadolint)
 hadolint docker/*/Dockerfile    # Lint Dockerfiles
-shellcheck docker/build.sh      # Lint shell scripts
+shellcheck docker/build.sh docker/generate.sh  # Lint shell scripts
 markdownlint .                  # Lint Markdown
 ```
 
@@ -125,6 +126,7 @@ docker/build.sh                 # Build all images for every version in the matr
 Individual images can be built with:
 
 ```bash
+docker/generate.sh python
 docker build --build-arg PYTHON_VERSION=3.14 -t dev-python:3.14 docker/python/
 ```
 
@@ -134,21 +136,34 @@ docker build --build-arg PYTHON_VERSION=3.14 -t dev-python:3.14 docker/python/
 
 ```text
 docker/
-  build.sh          # Builds all images locally
-  python/Dockerfile # Python dev image with uv
-  java/Dockerfile   # Java dev image, Eclipse Temurin
-  go/Dockerfile     # Go dev image with linters
-  ruby/Dockerfile   # Ruby dev image with bundler
-  rust/Dockerfile   # Rust dev image with cargo tools
+  build.sh                    # Builds all images locally
+  generate.sh                 # Expands Dockerfile.template → Dockerfile
+  common/                     # Shared fragments included via # @include
+  base/Dockerfile.template    # Base dev image (all common tools, no runtime)
+  python/Dockerfile.template  # Python dev image with uv
+  java/Dockerfile.template    # Java dev image, Eclipse Temurin
+  go/Dockerfile.template      # Go dev image with linters
+  ruby/Dockerfile.template    # Ruby dev image with bundler
+  rust/Dockerfile.template    # Rust dev image with cargo tools
 ```
+
+Each `Dockerfile.template` contains `# @include common/<fragment>.dockerfile`
+directives. `generate.sh` expands these to produce the final `Dockerfile`
+(which is gitignored). Run `docker/generate.sh` before `hadolint`.
 
 ### Common Layer
 
-Every image includes:
+Every image includes (installed via shared fragments in `docker/common/`):
 
-- **Node.js** (multi-stage copy from `node:22.22.0-bookworm-slim`)
-- **ShellCheck** (`0.11.0`)
+- **Node.js 22** (via NodeSource apt repository)
 - **markdownlint-cli** (`0.47.0`)
+- **ShellCheck** (`0.11.0`)
+- **shfmt** (`3.12.0`)
+- **actionlint** (`1.7.11`)
+- **git-cliff** (`2.8.0`)
+- **gh** (GitHub CLI, via official apt repository)
+- **jq**, git, curl, openssh-client
+- **standard-tooling** (pinned to `ST_TOOLING_TAG`, currently `v1.4`)
 - Language-specific package manager and linting tools
 
 ### GHCR Publishing
@@ -169,8 +184,8 @@ No PAT or additional secret is needed. However, each GHCR package must
 explicitly grant this repository write access because the packages were
 originally created by the `standard-tooling` repository.
 
-Per-package setup (one-time, for each of `dev-python`, `dev-java`, `dev-go`,
-`dev-ruby`, `dev-rust`):
+Per-package setup (one-time, for each of `dev-base`, `dev-python`, `dev-java`,
+`dev-go`, `dev-ruby`, `dev-rust`):
 
 1. Navigate to the package settings page on GHCR.
 2. Under **Manage Actions access**, click **Add Repository**.
