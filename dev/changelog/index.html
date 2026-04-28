@@ -799,6 +799,11 @@ and this project adheres to <a href="https://semver.org/">Semantic Versioning</a
 <li>add CVE-2026-29786 (tar) to trivyignore (#30)</li>
 <li>add CVE-2025-15558 (gh docker/cli, Windows-only) to trivyignore (#40)</li>
 <li>scan locally-built image with Trivy, not published :latest (#56)</li>
+<li>bump pip to &gt;=26.1 (CVE-2026-3219) (#63)</li>
+<li>triage HIGH/CRITICAL CVEs blocking docker-publish (#68)</li>
+<li>pin standard-tooling-pip fragment to v1.3 (#73)</li>
+<li>bump stale standard-actions trivy pins from @v1.1 to @v1.3 (#80)</li>
+<li>triage jq CVEs blocking docker-publish (post-#78) (#82)</li>
 </ul>
 <h3 id="ci">CI<a class="headerlink" href="#ci" title="Permanent link">&para;</a></h3>
 <ul>
@@ -810,6 +815,9 @@ and this project adheres to <a href="https://semver.org/">Semantic Versioning</a
 <li>document GHCR package access prerequisites for publishing (#6)</li>
 <li>add GHCR publishing prerequisites to MkDocs site (#8)</li>
 <li>update documentation for templating system and current tooling inventory (#43)</li>
+<li>add cliff config + regenerate CHANGELOG; sanity-check docs accuracy (#58)</li>
+<li>remove include directives and downgrade standards-and-conventions refs (#87)</li>
+<li>add versioned image tags spec and pushback review (#88)</li>
 </ul>
 <h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
 <ul>
@@ -826,6 +834,8 @@ and this project adheres to <a href="https://semver.org/">Semantic Versioning</a
 <li>add openssh-client to all container images (#46)</li>
 <li>adopt git worktree convention for parallel AI agent development (#49)</li>
 <li>pin standard-tooling to rolling minor tag; rebuild on release (#51) (#52)</li>
+<li>prune dangling images and stale build cache after local build (#74)</li>
+<li>add jq to all dev container images (#78)</li>
 </ul>
 <h3 id="refactoring">Refactoring<a class="headerlink" href="#refactoring" title="Permanent link">&para;</a></h3>
 <ul>
