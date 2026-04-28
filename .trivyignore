@@ -283,3 +283,13 @@ CVE-2026-35414
 # templates are unaffected. Fix in 4.0.4.1; revisit when bumping the
 # default gemset becomes worthwhile.
 CVE-2026-41316
+
+# jq / libjq1 (Debian trixie, jq 1.7.1) — used for JSON parsing in
+# CI workflows (docs-deploy version-command), not on untrusted input.
+# No Debian fix available (status=affected). Issue #81.
+
+# CVE-2026-32316 (jq) — DoS or potential arbitrary code execution.
+CVE-2026-32316
+
+# CVE-2026-40164 (jq) — DoS via crafted JSON causing hash collisions.
+CVE-2026-40164
