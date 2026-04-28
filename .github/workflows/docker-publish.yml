@@ -119,7 +119,7 @@ jobs:
             "docker/${{ matrix.language }}"
 
       - name: Trivy image scan
-        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.3
+        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.4
         with:
           scan-type: image
           scan-ref: ${{ env.CANDIDATE }}
@@ -170,7 +170,7 @@ jobs:
         run: docker build -t "$CANDIDATE" docker/base
 
       - name: Trivy image scan
-        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.3
+        uses: wphillipmoore/standard-actions/actions/security/trivy@v1.4
         with:
           scan-type: image
           scan-ref: ${{ env.CANDIDATE }}
