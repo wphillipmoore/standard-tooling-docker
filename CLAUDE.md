@@ -2,9 +2,6 @@
 
 This file provides guidance to Claude Code when working in this repository.
 
-<!-- include: docs/standards-and-conventions.md -->
-<!-- include: docs/repository-standards.md -->
-
 ## Auto-memory policy
 
 **Do NOT use MEMORY.md.** Never write to MEMORY.md or any file under the
@@ -90,9 +87,9 @@ Docker-first development across all managed repositories.
 
 **Status**: Active
 
-**Canonical Standards**: This repository follows standards at
-<https://github.com/wphillipmoore/standards-and-conventions>
-(local path: `../standards-and-conventions` if available)
+**Standards reference**: <https://github.com/wphillipmoore/standards-and-conventions>
+— historical reference; active standards documentation lives in the
+standard-tooling repository under `docs/`.
 
 ## Development Commands
 
@@ -102,7 +99,7 @@ Docker-first development across all managed repositories.
 # Host-installed standard-tooling provides st-* commands on PATH.
 # Install per the host-level-tool spec
 # (https://github.com/wphillipmoore/standard-tooling/blob/develop/docs/specs/host-level-tool.md):
-uv tool install 'standard-tooling @ git+https://github.com/wphillipmoore/standard-tooling@v1.3'
+uv tool install 'standard-tooling @ git+https://github.com/wphillipmoore/standard-tooling@v1.4'
 # (or `pip install` into the same Python env that hosts `uv`).
 
 # Enable the pre-commit gate (refuses raw `git commit`; admits
