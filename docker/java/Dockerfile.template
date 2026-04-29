@@ -18,6 +18,4 @@ RUN apt-get update && \
 
 # Maven wrapper self-bootstraps from consuming repos.
 
-# @include common/standard-tooling-pip.dockerfile
-
 WORKDIR /workspace
