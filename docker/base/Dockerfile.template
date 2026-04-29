@@ -29,8 +29,6 @@ RUN pip install --no-cache-dir \
       "mkdocs-material==${MKDOCS_MATERIAL_VERSION}" \
       "mike==${MIKE_VERSION}"
 
-# @include common/standard-tooling-uv.dockerfile
-
 EXPOSE 8000
 
 WORKDIR /workspace
