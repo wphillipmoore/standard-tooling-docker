@@ -21,6 +21,4 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir --upgrade 'pip>=26.1' && \
     pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
 
-# @include common/standard-tooling-uv.dockerfile
-
 WORKDIR /workspace

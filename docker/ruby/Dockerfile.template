@@ -19,6 +19,4 @@ RUN apt-get update && \
 # --- Ruby tools --------------------------------------------------------------
 RUN gem install bundler
 
-# @include common/standard-tooling-pip.dockerfile
-
 WORKDIR /workspace
