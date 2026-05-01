@@ -29,7 +29,7 @@ ARG MIKE_VERSION=2.1.3
 RUN pip install --no-cache-dir \
       "mkdocs-material==${MKDOCS_MATERIAL_VERSION}" \
       "mike==${MIKE_VERSION}" \
-      pyyaml
+      pyyaml==6.0.3
 
 # --- Semgrep -----------------------------------------------------------------
 RUN uv tool install semgrep
