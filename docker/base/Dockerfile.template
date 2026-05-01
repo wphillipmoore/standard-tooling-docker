@@ -32,7 +32,13 @@ RUN pip install --no-cache-dir \
       pyyaml==6.0.3
 
 # --- Semgrep -----------------------------------------------------------------
-RUN uv tool install semgrep
+# Semgrep has a native extension (semgrep-core) that requires compilation.
+# Install build-essential for gcc, build, then remove to keep the image slim.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    uv tool install semgrep && \
+    apt-get purge -y --auto-remove build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 EXPOSE 8000
 
