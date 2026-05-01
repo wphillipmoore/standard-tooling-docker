@@ -14,3 +14,7 @@ RUN curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONL
 ARG GIT_CLIFF_VERSION=2.8.0
 RUN curl -fsSL "https://github.com/orhun/git-cliff/releases/download/v${GIT_CLIFF_VERSION}/git-cliff-${GIT_CLIFF_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
     | tar -xz --strip-components=1 -C /usr/local/bin/ "git-cliff-${GIT_CLIFF_VERSION}/git-cliff"
+
+ARG HADOLINT_VERSION=2.14.0
+RUN curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
+    -o /usr/local/bin/hadolint && chmod +x /usr/local/bin/hadolint

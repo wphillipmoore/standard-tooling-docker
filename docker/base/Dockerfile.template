@@ -28,7 +28,11 @@ ARG MKDOCS_MATERIAL_VERSION=9.6.12
 ARG MIKE_VERSION=2.1.3
 RUN pip install --no-cache-dir \
       "mkdocs-material==${MKDOCS_MATERIAL_VERSION}" \
-      "mike==${MIKE_VERSION}"
+      "mike==${MIKE_VERSION}" \
+      pyyaml
+
+# --- Semgrep -----------------------------------------------------------------
+RUN uv tool install semgrep
 
 EXPOSE 8000
 
