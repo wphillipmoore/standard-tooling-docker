@@ -146,6 +146,14 @@ CVE-2026-31666
 CVE-2026-31667
 CVE-2026-31669
 CVE-2026-31788
+CVE-2026-31692
+CVE-2026-31709
+CVE-2026-31771
+CVE-2026-43009
+CVE-2026-43021
+CVE-2026-43029
+CVE-2026-43042
+CVE-2026-43048
 
 # Debian system cpython — present in go/ruby base images via Debian
 # packages. Not the language runtime we use, no Debian patch available.
