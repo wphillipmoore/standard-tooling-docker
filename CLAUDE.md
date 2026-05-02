@@ -11,6 +11,7 @@ plugin/skill issue) before writing. See that file for the full
 workflow.
 
 Available skills:
+
 - `/standard-tooling:memory-init` — set up or update the policy header
   in a project's `MEMORY.md`.
 - `/standard-tooling:memory-audit` — structured collaborative review
