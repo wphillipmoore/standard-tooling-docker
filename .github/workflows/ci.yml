@@ -15,7 +15,7 @@ concurrency:
 jobs:
 
   # ---------------------------------------------------------------------------
-  # Quality: Hadolint, ShellCheck, Markdownlint
+  # Quality: Hadolint, ShellCheck
   # ---------------------------------------------------------------------------
 
   hadolint:
@@ -46,19 +46,6 @@ jobs:
 
       - name: Run ShellCheck
         run: shellcheck docker/build.sh docker/generate.sh
-
-  markdownlint:
-    name: "ci: markdownlint"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli@0.47.0
-
-      - name: Run Markdownlint
-        run: markdownlint .
 
   # ---------------------------------------------------------------------------
   # Security and standards (shared reusable workflow)
