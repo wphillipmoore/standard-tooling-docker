@@ -317,6 +317,10 @@ CVE-2026-33845
 # the image.
 CVE-2026-31568
 
+# linux-libc-dev — kernel ALSA ctxfi index mapping error check.
+# Container false positive: same rationale as above.
+CVE-2026-31777
+
 # openssh-client — arbitrary command execution via shell metacharacters
 # in username. Requires connecting to a malicious server with a crafted
 # username. Image uses ssh only for git remotes to known hosts (GitHub).
