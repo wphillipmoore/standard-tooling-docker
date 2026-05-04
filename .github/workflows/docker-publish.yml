@@ -205,14 +205,15 @@ jobs:
       - name: Delete candidate tag
         if: always()
         run: |
-          gh api --method DELETE \
+          VERSION_ID=$(gh api \
             "/user/packages/container/dev-${{ matrix.language }}/versions" \
-            -q ".[] | select(.metadata.container.tags[] == \"${{ matrix.version }}-candidate\") | .id" \
-            2>/dev/null | while read -r VERSION_ID; do
-              gh api --method DELETE \
-                "/user/packages/container/dev-${{ matrix.language }}/versions/${VERSION_ID}" \
-                2>/dev/null || true
-            done
+            --jq '.[] | select(.metadata.container.tags[] == "${{ matrix.version }}-candidate") | .id' \
+            2>/dev/null) || true
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/user/packages/container/dev-${{ matrix.language }}/versions/${VERSION_ID}" \
+              2>/dev/null || true
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -340,13 +341,14 @@ jobs:
       - name: Delete candidate tag
         if: always()
         run: |
-          gh api --method DELETE \
+          VERSION_ID=$(gh api \
             "/user/packages/container/dev-base/versions" \
-            -q '.[] | select(.metadata.container.tags[] == "latest-candidate") | .id' \
-            2>/dev/null | while read -r VERSION_ID; do
-              gh api --method DELETE \
-                "/user/packages/container/dev-base/versions/${VERSION_ID}" \
-                2>/dev/null || true
-            done
+            --jq '.[] | select(.metadata.container.tags[] == "latest-candidate") | .id' \
+            2>/dev/null) || true
+          if [ -n "$VERSION_ID" ]; then
+            gh api --method DELETE \
+              "/user/packages/container/dev-base/versions/${VERSION_ID}" \
+              2>/dev/null || true
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
