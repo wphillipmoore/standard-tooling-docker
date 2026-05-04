@@ -312,6 +312,11 @@ CVE-2026-4878
 # No Debian fix available (status=affected).
 CVE-2026-33845
 
+# libgnutls30t64 (Debian trixie) — heap buffer overflow in GnuTLS.
+# Same package as above. Curl uses GnuTLS for TLS but only connects to
+# known hosts (GitHub, PyPI, NodeSource). No Debian fix available.
+CVE-2026-33846
+
 # linux-libc-dev — kernel s390/mm secure storage fixup. Container false
 # positive: containers use the host kernel, not the kernel headers in
 # the image.

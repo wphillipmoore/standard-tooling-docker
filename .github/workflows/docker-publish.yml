@@ -201,7 +201,6 @@ jobs:
             echo "  Final:     $FINAL_DIGEST" >&2
             exit 1
           fi
-
   publish-base:
     name: "publish: dev-base:latest"
     needs: [hadolint]
@@ -322,4 +321,3 @@ jobs:
             echo "  Final:     $FINAL_DIGEST" >&2
             exit 1
           fi
-
