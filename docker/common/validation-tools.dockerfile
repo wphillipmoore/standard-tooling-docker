@@ -1,20 +1,36 @@
 # --- Binary tools (no apt packages available) --------------------------------
+# Architecture mapping: Docker buildx injects TARGETARCH (amd64 or arm64).
+# Each tool uses different naming conventions for its release artifacts.
+ARG TARGETARCH
+
 ARG SHELLCHECK_VERSION=0.11.0
-RUN curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
-    | tar -xJ --strip-components=1 -C /usr/local/bin/ "shellcheck-v${SHELLCHECK_VERSION}/shellcheck"
-
 ARG SHFMT_VERSION=3.12.0
-RUN curl -fsSL "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" \
-    -o /usr/local/bin/shfmt && chmod +x /usr/local/bin/shfmt
-
 ARG ACTIONLINT_VERSION=1.7.11
-RUN curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
-    | tar -xz -C /usr/local/bin/ actionlint
-
 ARG GIT_CLIFF_VERSION=2.8.0
-RUN curl -fsSL "https://github.com/orhun/git-cliff/releases/download/v${GIT_CLIFF_VERSION}/git-cliff-${GIT_CLIFF_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
-    | tar -xz --strip-components=1 -C /usr/local/bin/ "git-cliff-${GIT_CLIFF_VERSION}/git-cliff"
-
 ARG HADOLINT_VERSION=2.14.0
-RUN curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-    -o /usr/local/bin/hadolint && chmod +x /usr/local/bin/hadolint
+
+RUN case "${TARGETARCH}" in \
+      amd64) \
+        SC_ARCH="x86_64" ; \
+        SHFMT_ARCH="amd64" ; \
+        AL_ARCH="amd64" ; \
+        GC_ARCH="x86_64-unknown-linux-gnu" ; \
+        HL_ARCH="linux-x86_64" ;; \
+      arm64) \
+        SC_ARCH="aarch64" ; \
+        SHFMT_ARCH="arm64" ; \
+        AL_ARCH="arm64" ; \
+        GC_ARCH="aarch64-unknown-linux-gnu" ; \
+        HL_ARCH="linux-arm64" ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${SC_ARCH}.tar.xz" \
+      | tar -xJ --strip-components=1 -C /usr/local/bin/ "shellcheck-v${SHELLCHECK_VERSION}/shellcheck" && \
+    curl -fsSL "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_${SHFMT_ARCH}" \
+      -o /usr/local/bin/shfmt && chmod +x /usr/local/bin/shfmt && \
+    curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_${AL_ARCH}.tar.gz" \
+      | tar -xz -C /usr/local/bin/ actionlint && \
+    curl -fsSL "https://github.com/orhun/git-cliff/releases/download/v${GIT_CLIFF_VERSION}/git-cliff-${GIT_CLIFF_VERSION}-${GC_ARCH}.tar.gz" \
+      | tar -xz --strip-components=1 -C /usr/local/bin/ "git-cliff-${GIT_CLIFF_VERSION}/git-cliff" && \
+    curl -fsSL "https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-${HL_ARCH}" \
+      -o /usr/local/bin/hadolint && chmod +x /usr/local/bin/hadolint
