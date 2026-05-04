@@ -77,7 +77,7 @@ convention:
 | shfmt | `amd64` | `arm64` |
 | actionlint | `amd64` | `arm64` |
 | git-cliff | `x86_64-unknown-linux-gnu` | `aarch64-unknown-linux-gnu` |
-| hadolint | `Linux-x86_64` | `linux-arm64` |
+| hadolint | `linux-x86_64` | `linux-arm64` |
 
 > **Verified 2026-05-03** against each tool's GitHub release artifacts.
 
