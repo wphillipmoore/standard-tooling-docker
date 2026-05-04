@@ -85,11 +85,8 @@ jobs:
 
     env:
       IMAGE: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}:${{ matrix.version }}"
-      # Local-only tag scanned by Trivy. Using the GHCR-namespaced tag
-      # would cause Trivy to pull the already-published :latest from the
-      # registry instead of scanning the freshly-built local image. See
-      # issue #55.
-      CANDIDATE: "dev-${{ matrix.language }}-candidate:${{ matrix.version }}"
+      CANDIDATE: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}:${{ matrix.version }}-candidate"
+      CACHE_TAG: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}:cache-${{ matrix.version }}"
 
     steps:
       - name: Checkout code
@@ -98,6 +95,12 @@ jobs:
       - name: Generate Dockerfile from template
         run: docker/generate.sh ${{ matrix.language }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to GHCR
         uses: docker/login-action@v4
         with:
@@ -105,31 +108,76 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg "${{ matrix.build-arg }}=${{ matrix.version }}" \
-            -t "$CANDIDATE" \
-            "docker/${{ matrix.language }}"
+      - name: Build and push candidate
+        uses: docker/build-push-action@v6
+        with:
+          context: "docker/${{ matrix.language }}"
+          platforms: linux/amd64,linux/arm64
+          build-args: "${{ matrix.build-arg }}=${{ matrix.version }}"
+          tags: ${{ env.CANDIDATE }}
+          cache-from: type=registry,ref=${{ env.CACHE_TAG }}
+          cache-to: type=registry,ref=${{ env.CACHE_TAG }},mode=max
+          push: true
 
-      - name: Trivy image scan
+      - name: Trivy scan (amd64)
         uses: wphillipmoore/standard-actions/actions/security/trivy@v1.4
         with:
           scan-type: image
           scan-ref: ${{ env.CANDIDATE }}
           exit-code: "1"
-          sarif-category: "trivy-image-${{ matrix.language }}-${{ matrix.version }}"
+          sarif-category: "trivy-image-${{ matrix.language }}-${{ matrix.version }}-amd64"
           trivyignores: .trivyignore
 
-      - name: Tag and push image
+      - name: Trivy scan (arm64)
+        shell: bash
+        env:
+          TRIVY_IMAGE: aquasec/trivy:0.70.0
         run: |
-          docker tag "$CANDIDATE" "$IMAGE"
-          docker push "$IMAGE"
+          TRIVYIGNORE_ARGS=""
+          if [ -f .trivyignore ]; then
+            TRIVYIGNORE_ARGS="--ignorefile .trivyignore"
+          fi
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -w /workspace \
+            --entrypoint sh \
+            "$TRIVY_IMAGE" \
+            -c "
+              set -e
+              trivy image \
+                --scanners vuln \
+                --severity CRITICAL,HIGH \
+                --platform linux/arm64 \
+                --exit-code 0 \
+                --format json \
+                --output /tmp/trivy-raw.json \
+                $TRIVYIGNORE_ARGS \
+                \"${{ env.CANDIDATE }}\"
+              trivy convert \
+                --severity CRITICAL,HIGH \
+                --format table \
+                --exit-code 0 \
+                /tmp/trivy-raw.json
+              trivy convert \
+                --severity CRITICAL,HIGH \
+                --format sarif \
+                --exit-code 1 \
+                --output /workspace/trivy-arm64.sarif \
+                /tmp/trivy-raw.json
+            "
 
-      - name: Get image digest
+      - name: Upload SARIF (arm64)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-arm64.sarif
+          category: "trivy-image-${{ matrix.language }}-${{ matrix.version }}-arm64"
+
+      - name: Get candidate digest
         id: digest
         run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
+          DIGEST=$(docker buildx imagetools inspect "$CANDIDATE" --format '{{.Manifest.Digest}}')
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Attest build provenance
@@ -138,20 +186,56 @@ jobs:
           subject-name: "ghcr.io/wphillipmoore/dev-${{ matrix.language }}"
           subject-digest: ${{ steps.digest.outputs.digest }}
 
+      - name: Promote to final tag
+        run: |
+          docker buildx imagetools create \
+            --tag "$IMAGE" \
+            "$CANDIDATE"
+
+      - name: Verify digest preservation
+        run: |
+          FINAL_DIGEST=$(docker buildx imagetools inspect "$IMAGE" --format '{{.Manifest.Digest}}')
+          if [ "$FINAL_DIGEST" != "${{ steps.digest.outputs.digest }}" ]; then
+            echo "ERROR: Digest mismatch after promotion!" >&2
+            echo "  Candidate: ${{ steps.digest.outputs.digest }}" >&2
+            echo "  Final:     $FINAL_DIGEST" >&2
+            exit 1
+          fi
+
+      - name: Delete candidate tag
+        if: always()
+        run: |
+          gh api --method DELETE \
+            "/user/packages/container/dev-${{ matrix.language }}/versions" \
+            -q ".[] | select(.metadata.container.tags[] == \"${{ matrix.version }}-candidate\") | .id" \
+            2>/dev/null | while read -r VERSION_ID; do
+              gh api --method DELETE \
+                "/user/packages/container/dev-${{ matrix.language }}/versions/${VERSION_ID}" \
+                2>/dev/null || true
+            done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish-base:
     name: "publish: dev-base:latest"
     needs: [hadolint]
     runs-on: ubuntu-latest
     env:
       IMAGE: ghcr.io/wphillipmoore/dev-base:latest
-      # Local-only tag scanned by Trivy. See issue #55.
-      CANDIDATE: dev-base-candidate:latest
+      CANDIDATE: ghcr.io/wphillipmoore/dev-base:latest-candidate
+      CACHE_TAG: ghcr.io/wphillipmoore/dev-base:cache-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Generate Dockerfile from template
         run: docker/generate.sh base
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to GHCR
         uses: docker/login-action@v4
@@ -160,27 +244,75 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build image
-        run: docker build -t "$CANDIDATE" docker/base
+      - name: Build and push candidate
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/base
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ env.CANDIDATE }}
+          cache-from: type=registry,ref=${{ env.CACHE_TAG }}
+          cache-to: type=registry,ref=${{ env.CACHE_TAG }},mode=max
+          push: true
 
-      - name: Trivy image scan
+      - name: Trivy scan (amd64)
         uses: wphillipmoore/standard-actions/actions/security/trivy@v1.4
         with:
           scan-type: image
           scan-ref: ${{ env.CANDIDATE }}
           exit-code: "1"
-          sarif-category: trivy-image-base
+          sarif-category: trivy-image-base-amd64
           trivyignores: .trivyignore
 
-      - name: Tag and push image
+      - name: Trivy scan (arm64)
+        shell: bash
+        env:
+          TRIVY_IMAGE: aquasec/trivy:0.70.0
         run: |
-          docker tag "$CANDIDATE" "$IMAGE"
-          docker push "$IMAGE"
+          TRIVYIGNORE_ARGS=""
+          if [ -f .trivyignore ]; then
+            TRIVYIGNORE_ARGS="--ignorefile .trivyignore"
+          fi
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -w /workspace \
+            --entrypoint sh \
+            "$TRIVY_IMAGE" \
+            -c "
+              set -e
+              trivy image \
+                --scanners vuln \
+                --severity CRITICAL,HIGH \
+                --platform linux/arm64 \
+                --exit-code 0 \
+                --format json \
+                --output /tmp/trivy-raw.json \
+                $TRIVYIGNORE_ARGS \
+                \"${{ env.CANDIDATE }}\"
+              trivy convert \
+                --severity CRITICAL,HIGH \
+                --format table \
+                --exit-code 0 \
+                /tmp/trivy-raw.json
+              trivy convert \
+                --severity CRITICAL,HIGH \
+                --format sarif \
+                --exit-code 1 \
+                --output /workspace/trivy-arm64.sarif \
+                /tmp/trivy-raw.json
+            "
 
-      - name: Get image digest
+      - name: Upload SARIF (arm64)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-arm64.sarif
+          category: trivy-image-base-arm64
+
+      - name: Get candidate digest
         id: digest
         run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE" | cut -d'@' -f2)
+          DIGEST=$(docker buildx imagetools inspect "$CANDIDATE" --format '{{.Manifest.Digest}}')
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
 
       - name: Attest build provenance
@@ -188,3 +320,33 @@ jobs:
         with:
           subject-name: ghcr.io/wphillipmoore/dev-base
           subject-digest: ${{ steps.digest.outputs.digest }}
+
+      - name: Promote to final tag
+        run: |
+          docker buildx imagetools create \
+            --tag "$IMAGE" \
+            "$CANDIDATE"
+
+      - name: Verify digest preservation
+        run: |
+          FINAL_DIGEST=$(docker buildx imagetools inspect "$IMAGE" --format '{{.Manifest.Digest}}')
+          if [ "$FINAL_DIGEST" != "${{ steps.digest.outputs.digest }}" ]; then
+            echo "ERROR: Digest mismatch after promotion!" >&2
+            echo "  Candidate: ${{ steps.digest.outputs.digest }}" >&2
+            echo "  Final:     $FINAL_DIGEST" >&2
+            exit 1
+          fi
+
+      - name: Delete candidate tag
+        if: always()
+        run: |
+          gh api --method DELETE \
+            "/user/packages/container/dev-base/versions" \
+            -q '.[] | select(.metadata.container.tags[] == "latest-candidate") | .id' \
+            2>/dev/null | while read -r VERSION_ID; do
+              gh api --method DELETE \
+                "/user/packages/container/dev-base/versions/${VERSION_ID}" \
+                2>/dev/null || true
+            done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
