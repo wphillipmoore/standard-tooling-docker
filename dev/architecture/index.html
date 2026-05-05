@@ -635,6 +635,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multi-architecture-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Architecture Support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#publishing" class="md-nav__link">
     <span class="md-ellipsis">
       Publishing
@@ -771,6 +780,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multi-architecture-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-Architecture Support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#publishing" class="md-nav__link">
     <span class="md-ellipsis">
       Publishing
@@ -853,16 +871,15 @@
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── common/
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── github-cli.dockerfile
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── node-markdownlint.dockerfile
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── python-support.dockerfile
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── standard-tooling-pip.dockerfile
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   ├── standard-tooling-uv.dockerfile
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│   └── validation-tools.dockerfile
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── base/Dockerfile.template
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── python/Dockerfile.template
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── ruby/Dockerfile.template
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├── go/Dockerfile.template
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>├── java/Dockerfile.template
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>└── rust/Dockerfile.template
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── path-defaults.dockerfile
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   ├── python-support.dockerfile
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│   └── validation-tools.dockerfile
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├── base/Dockerfile.template
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├── python/Dockerfile.template
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├── ruby/Dockerfile.template
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>├── go/Dockerfile.template
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├── java/Dockerfile.template
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└── rust/Dockerfile.template
 </code></pre></div>
 <h3 id="templating">Templating<a class="headerlink" href="#templating" title="Permanent link">&para;</a></h3>
 <p>Each <code>Dockerfile.template</code> contains standard Dockerfile instructions plus
@@ -870,8 +887,8 @@
 replaces each directive with the full contents of the referenced fragment,
 producing a final <code>Dockerfile</code> in the same directory.</p>
 <p>This eliminates duplication — shared tool installations (GitHub CLI,
-Node.js, markdownlint, validation tools, standard-tooling) are maintained
-once in <code>docker/common/</code> and included by every template that needs them.</p>
+Node.js, markdownlint, validation tools) are maintained once in
+<code>docker/common/</code> and included by every template that needs them.</p>
 <h3 id="version-management">Version management<a class="headerlink" href="#version-management" title="Permanent link">&para;</a></h3>
 <p>All shared tool versions are pinned via <code>ARG</code> directives in the common
 fragments. A version bump is a one-line change in one file, applied to
@@ -879,24 +896,23 @@ all images automatically at build time.</p>
 <h2 id="common-tooling-layer">Common Tooling Layer<a class="headerlink" href="#common-tooling-layer" title="Permanent link">&para;</a></h2>
 <p>Every language image includes the following shared fragments:</p>
 <ul>
+<li><strong><code>path-defaults.dockerfile</code></strong> — Sets PATH for <code>uv tool install</code>
+  entry points across GitHub Actions and local contexts.</li>
 <li><strong><code>node-markdownlint.dockerfile</code></strong> — Node.js via NodeSource apt repo
   and markdownlint-cli via npm.</li>
 <li><strong><code>github-cli.dockerfile</code></strong> — GitHub CLI via the official apt repo.</li>
-<li><strong><code>validation-tools.dockerfile</code></strong> — Binary installs of shellcheck,
-  shfmt, actionlint, and git-cliff.</li>
-<li><strong><code>python-support.dockerfile</code></strong> — Minimal Python plus yamllint, used
-  by non-Python images that still need YAML linting.</li>
-<li><strong><code>standard-tooling-*.dockerfile</code></strong> — Clones and installs
-  <a href="https://github.com/wphillipmoore/standard-tooling">standard-tooling</a>
-  for <code>st-*</code> CLI commands. The image is pinned to the rolling minor
-  tag (currently <code>v1.3</code>); a <code>repository_dispatch</code> from
-  <code>standard-tooling</code>'s release pipeline rebuilds the image on every
-  patch release. Python-based images use the <code>uv</code> variant; others
-  use <code>pip</code>.</li>
+<li><strong><code>validation-tools.dockerfile</code></strong> — Architecture-aware binary
+  installs of shellcheck, shfmt, actionlint, git-cliff, and hadolint.
+  Uses <code>TARGETARCH</code> (injected by Docker Buildx) to select the correct
+  binary for amd64 or arm64.</li>
+<li><strong><code>python-support.dockerfile</code></strong> — Minimal Python plus yamllint and
+  uv, used by non-Python images.</li>
 </ul>
+<p>Python-based images (<code>dev-python</code>, <code>dev-base</code>) install yamllint and uv
+directly via pip rather than the <code>python-support</code> fragment.</p>
 <p>The <code>dev-base</code> image includes all common fragments plus documentation
-tooling (MkDocs Material, mike). It is the fallback image for repos
-with no detected language.</p>
+tooling (MkDocs Material, mike, semgrep). It is the fallback image for
+repos with no detected language.</p>
 <h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h2>
 <p><strong>Thin images</strong> — Each image provides the language runtime, package
 manager, and common tooling layer. Project-specific dependencies (from
@@ -906,11 +922,25 @@ container startup by the consuming repository's test script.</p>
 Any repository using the supported language can use them.</p>
 <p><strong>No duplication</strong> — Shared tooling is maintained in common fragments.
 Adding a tool to all images means editing one fragment file.</p>
+<h2 id="multi-architecture-support">Multi-Architecture Support<a class="headerlink" href="#multi-architecture-support" title="Permanent link">&para;</a></h2>
+<p>All images are published as multi-architecture manifests supporting
+<strong>amd64</strong> and <strong>arm64</strong>. Binary tool downloads in <code>validation-tools.dockerfile</code>
+use <code>TARGETARCH</code> (injected by Docker Buildx) to select the correct
+platform artifact.</p>
+<p>Local builds via <code>docker/build.sh</code> build for the host's native
+architecture only (for speed). The CI pipeline builds both platforms
+using QEMU emulation on the GitHub Actions runner.</p>
 <h2 id="publishing">Publishing<a class="headerlink" href="#publishing" title="Permanent link">&para;</a></h2>
-<p>Images are published to GitHub Container Registry on every push to
-<code>develop</code> or <code>main</code> via the <code>docker-publish.yml</code> workflow. Each image is
-scanned with Trivy before push and includes SLSA build provenance
-attestation.</p>
+<p>Images are published as multi-arch manifests to GitHub Container Registry
+on every push to <code>develop</code> or <code>main</code> via the <code>docker-publish.yml</code>
+workflow. The pipeline:</p>
+<ol>
+<li>Builds a candidate tag for both platforms (amd64 + arm64)</li>
+<li>Scans each platform independently with Trivy (SARIF upload)</li>
+<li>Attests build provenance (SLSA via GitHub attestations)</li>
+<li>Promotes the candidate to the final tag via <code>docker buildx imagetools create</code></li>
+<li>Verifies digest preservation between candidate and final</li>
+</ol>
 <h3 id="image-namespace">Image namespace<a class="headerlink" href="#image-namespace" title="Permanent link">&para;</a></h3>
 <p>Image URLs use the <strong>user namespace</strong> (<code>ghcr.io/wphillipmoore/...</code>), not
 a repo-specific namespace. This means image paths are stable across

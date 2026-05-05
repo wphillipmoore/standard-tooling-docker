@@ -763,8 +763,8 @@
 
 <h1 id="images">Images<a class="headerlink" href="#images" title="Permanent link">&para;</a></h1>
 <p>Every image shares a common tooling layer and adds language-specific
-runtimes and tools. Images are published to
-<code>ghcr.io/wphillipmoore/dev-&lt;language&gt;:&lt;version&gt;</code>.</p>
+runtimes and tools. Images are published as multi-architecture manifests
+(amd64 + arm64) to <code>ghcr.io/wphillipmoore/dev-&lt;language&gt;:&lt;version&gt;</code>.</p>
 <h2 id="common-layer">Common Layer<a class="headerlink" href="#common-layer" title="Permanent link">&para;</a></h2>
 <p>All language images include:</p>
 <table>
@@ -812,9 +812,19 @@ runtimes and tools. Images are published to
 <td>Changelog generation</td>
 </tr>
 <tr>
-<td>standard-tooling</td>
-<td>v1.3</td>
-<td><code>st-*</code> CLI commands (rolling)</td>
+<td>hadolint</td>
+<td>2.14.0</td>
+<td>Dockerfile linting</td>
+</tr>
+<tr>
+<td>uv</td>
+<td>0.7.12</td>
+<td>Python package manager</td>
+</tr>
+<tr>
+<td>yamllint</td>
+<td>1.38.0</td>
+<td>YAML linting</td>
 </tr>
 <tr>
 <td>git</td>
@@ -834,32 +844,11 @@ runtimes and tools. Images are published to
 </tbody>
 </table>
 <p>The <code>dev-base</code> image includes the full common layer plus documentation
-tooling (MkDocs Material, mike). It is the fallback image for repos
-with no detected language.</p>
-<p>Images that include Python (dev-python, dev-base) also have:</p>
-<table>
-<thead>
-<tr>
-<th>Tool</th>
-<th>Version</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>yamllint</td>
-<td>1.38.0</td>
-<td>YAML linting</td>
-</tr>
-<tr>
-<td>uv</td>
-<td>0.7.12</td>
-<td>Package manager</td>
-</tr>
-</tbody>
-</table>
-<p>Non-Python images that need YAML linting install Python and yamllint via
-the <code>python-support</code> fragment.</p>
+tooling (MkDocs Material, mike, semgrep). It is the fallback image for
+repos with no detected language.</p>
+<p>Non-Python images install Python, yamllint, and uv via the
+<code>python-support</code> fragment. Python-based images (<code>dev-python</code>, <code>dev-base</code>)
+install them directly via pip.</p>
 <h2 id="python">Python<a class="headerlink" href="#python" title="Permanent link">&para;</a></h2>
 <p><strong>Base</strong>: <code>python:&lt;version&gt;-slim</code>
 <strong>Versions</strong>: 3.12, 3.13, 3.14</p>
@@ -1013,9 +1002,14 @@ plus documentation tooling. It is the fallback image used by
 <td>Versioned doc deployment</td>
 </tr>
 <tr>
-<td>uv</td>
-<td>0.7.12</td>
-<td>Package manager</td>
+<td>semgrep</td>
+<td>latest</td>
+<td>Static analysis</td>
+</tr>
+<tr>
+<td>pyyaml</td>
+<td>6.0.3</td>
+<td>YAML parsing (MkDocs dep)</td>
 </tr>
 </tbody>
 </table>
