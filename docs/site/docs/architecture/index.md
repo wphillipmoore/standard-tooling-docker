@@ -17,9 +17,8 @@ docker/
 ├── common/
 │   ├── github-cli.dockerfile
 │   ├── node-markdownlint.dockerfile
+│   ├── path-defaults.dockerfile
 │   ├── python-support.dockerfile
-│   ├── standard-tooling-pip.dockerfile
-│   ├── standard-tooling-uv.dockerfile
 │   └── validation-tools.dockerfile
 ├── base/Dockerfile.template
 ├── python/Dockerfile.template
@@ -37,8 +36,8 @@ replaces each directive with the full contents of the referenced fragment,
 producing a final `Dockerfile` in the same directory.
 
 This eliminates duplication — shared tool installations (GitHub CLI,
-Node.js, markdownlint, validation tools, standard-tooling) are maintained
-once in `docker/common/` and included by every template that needs them.
+Node.js, markdownlint, validation tools) are maintained once in
+`docker/common/` and included by every template that needs them.
 
 ### Version management
 
@@ -50,24 +49,24 @@ all images automatically at build time.
 
 Every language image includes the following shared fragments:
 
+- **`path-defaults.dockerfile`** — Sets PATH for `uv tool install`
+  entry points across GitHub Actions and local contexts.
 - **`node-markdownlint.dockerfile`** — Node.js via NodeSource apt repo
   and markdownlint-cli via npm.
 - **`github-cli.dockerfile`** — GitHub CLI via the official apt repo.
-- **`validation-tools.dockerfile`** — Binary installs of shellcheck,
-  shfmt, actionlint, and git-cliff.
-- **`python-support.dockerfile`** — Minimal Python plus yamllint, used
-  by non-Python images that still need YAML linting.
-- **`standard-tooling-*.dockerfile`** — Clones and installs
-  [standard-tooling](https://github.com/wphillipmoore/standard-tooling)
-  for `st-*` CLI commands. The image is pinned to the rolling minor
-  tag (currently `v1.3`); a `repository_dispatch` from
-  `standard-tooling`'s release pipeline rebuilds the image on every
-  patch release. Python-based images use the `uv` variant; others
-  use `pip`.
+- **`validation-tools.dockerfile`** — Architecture-aware binary
+  installs of shellcheck, shfmt, actionlint, git-cliff, and hadolint.
+  Uses `TARGETARCH` (injected by Docker Buildx) to select the correct
+  binary for amd64 or arm64.
+- **`python-support.dockerfile`** — Minimal Python plus yamllint and
+  uv, used by non-Python images.
+
+Python-based images (`dev-python`, `dev-base`) install yamllint and uv
+directly via pip rather than the `python-support` fragment.
 
 The `dev-base` image includes all common fragments plus documentation
-tooling (MkDocs Material, mike). It is the fallback image for repos
-with no detected language.
+tooling (MkDocs Material, mike, semgrep). It is the fallback image for
+repos with no detected language.
 
 ## Design Principles
 
@@ -82,12 +81,28 @@ Any repository using the supported language can use them.
 **No duplication** — Shared tooling is maintained in common fragments.
 Adding a tool to all images means editing one fragment file.
 
+## Multi-Architecture Support
+
+All images are published as multi-architecture manifests supporting
+**amd64** and **arm64**. Binary tool downloads in `validation-tools.dockerfile`
+use `TARGETARCH` (injected by Docker Buildx) to select the correct
+platform artifact.
+
+Local builds via `docker/build.sh` build for the host's native
+architecture only (for speed). The CI pipeline builds both platforms
+using QEMU emulation on the GitHub Actions runner.
+
 ## Publishing
 
-Images are published to GitHub Container Registry on every push to
-`develop` or `main` via the `docker-publish.yml` workflow. Each image is
-scanned with Trivy before push and includes SLSA build provenance
-attestation.
+Images are published as multi-arch manifests to GitHub Container Registry
+on every push to `develop` or `main` via the `docker-publish.yml`
+workflow. The pipeline:
+
+1. Builds a candidate tag for both platforms (amd64 + arm64)
+2. Scans each platform independently with Trivy (SARIF upload)
+3. Attests build provenance (SLSA via GitHub attestations)
+4. Promotes the candidate to the final tag via `docker buildx imagetools create`
+5. Verifies digest preservation between candidate and final
 
 ### Image namespace
 

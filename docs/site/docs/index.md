@@ -7,9 +7,10 @@ ecosystem.
 ## Overview
 
 This repository maintains language-specific dev container images published
-to GitHub Container Registry (GHCR). Each image bundles the language
-runtime, package manager, and a common tooling layer so that CI pipelines
-and local development share the same environment.
+as multi-architecture manifests (amd64 + arm64) to GitHub Container
+Registry (GHCR). Each image bundles the language runtime, package manager,
+and a common tooling layer so that CI pipelines and local development
+share the same environment.
 
 ## Images
 
