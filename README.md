@@ -101,12 +101,17 @@ Every language image includes:
 - **shfmt** 3.12.0
 - **actionlint** 1.7.11
 - **git-cliff** 2.8.0
+- **hadolint** 2.14.0
+- **uv** 0.7.12
+- **yamllint** 1.38.0
 - **openssh-client** (SSH for git remote operations)
-- **standard-tooling** (`st-*` CLI commands)
+
+All images are published as multi-architecture manifests supporting
+both **amd64** and **arm64**.
 
 The `dev-base` image includes the full common layer plus documentation
-tooling (MkDocs Material, mike). It is the fallback image for repos
-with no detected language.
+tooling (MkDocs Material, mike, semgrep). It is the fallback image for
+repos with no detected language.
 
 ## Build System
 
@@ -120,9 +125,11 @@ for details.
 
 ## Publishing
 
-Images are published automatically on push to `develop` or `main` via
-the `docker-publish.yml` workflow. Manual rebuilds can be triggered via
-`workflow_dispatch` in the Actions tab.
+Images are built for both amd64 and arm64, scanned with Trivy on both
+platforms, attested with SLSA build provenance, and published to GHCR
+on push to `develop` or `main` via the `docker-publish.yml` workflow.
+Manual rebuilds can be triggered via `workflow_dispatch` in the Actions
+tab.
 
 Image URLs use the user namespace (`ghcr.io/wphillipmoore/...`), not a
 repo-specific namespace, so paths remain stable across repo migrations.

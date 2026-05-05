@@ -168,15 +168,22 @@ Every image includes (installed via shared fragments in `docker/common/`):
 - **shfmt** (`3.12.0`)
 - **actionlint** (`1.7.11`)
 - **git-cliff** (`2.8.0`)
+- **hadolint** (`2.14.0`)
 - **gh** (GitHub CLI, via official apt repository)
+- **uv** (`0.7.12`)
+- **yamllint** (`1.38.0`)
 - **jq**, git, curl, openssh-client
-- **standard-tooling** (pinned to `ST_TOOLING_TAG`, currently `v1.4`)
 - Language-specific package manager and linting tools
 
 ### GHCR Publishing
 
-Images are published to GitHub Container Registry by the `docker-publish.yml`
-workflow on push to `develop` or `main`, or via manual `workflow_dispatch`.
+Images are published as multi-architecture manifests (amd64 + arm64) to
+GitHub Container Registry by the `docker-publish.yml` workflow on push to
+`develop` or `main`, or via manual `workflow_dispatch`.
+
+The publish pipeline builds a candidate tag, scans both platforms with Trivy,
+attests build provenance (SLSA), then promotes the candidate to the final tag
+via `docker buildx imagetools create`.
 
 Image naming: `ghcr.io/wphillipmoore/dev-{language}:{version}`
 

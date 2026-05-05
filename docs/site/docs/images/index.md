@@ -1,8 +1,8 @@
 # Images
 
 Every image shares a common tooling layer and adds language-specific
-runtimes and tools. Images are published to
-`ghcr.io/wphillipmoore/dev-<language>:<version>`.
+runtimes and tools. Images are published as multi-architecture manifests
+(amd64 + arm64) to `ghcr.io/wphillipmoore/dev-<language>:<version>`.
 
 ## Common Layer
 
@@ -17,24 +17,20 @@ All language images include:
 | shfmt            | 3.12.0  | Shell script formatting        |
 | actionlint       | 1.7.11  | GitHub Actions linting         |
 | git-cliff        | 2.8.0   | Changelog generation           |
-| standard-tooling | v1.3    | `st-*` CLI commands (rolling)  |
+| hadolint         | 2.14.0  | Dockerfile linting             |
+| uv               | 0.7.12  | Python package manager         |
+| yamllint         | 1.38.0  | YAML linting                   |
 | git              | latest  | Repository operations          |
 | openssh-client   | latest  | SSH for git remote operations  |
 | curl             | latest  | HTTP requests                  |
 
 The `dev-base` image includes the full common layer plus documentation
-tooling (MkDocs Material, mike). It is the fallback image for repos
-with no detected language.
+tooling (MkDocs Material, mike, semgrep). It is the fallback image for
+repos with no detected language.
 
-Images that include Python (dev-python, dev-base) also have:
-
-| Tool     | Version | Purpose         |
-| -------- | ------- | --------------- |
-| yamllint | 1.38.0  | YAML linting    |
-| uv       | 0.7.12  | Package manager |
-
-Non-Python images that need YAML linting install Python and yamllint via
-the `python-support` fragment.
+Non-Python images install Python, yamllint, and uv via the
+`python-support` fragment. Python-based images (`dev-python`, `dev-base`)
+install them directly via pip.
 
 ## Python
 
@@ -99,8 +95,9 @@ The base image includes the full common layer (all tools listed above)
 plus documentation tooling. It is the fallback image used by
 `st-docker-run` when no language is detected.
 
-| Tool             | Version | Purpose                    |
-| ---------------- | ------- | -------------------------- |
-| MkDocs Material  | 9.6.12  | Documentation site builder |
-| mike             | 2.1.3   | Versioned doc deployment   |
-| uv               | 0.7.12  | Package manager            |
+| Tool            | Version | Purpose                    |
+| --------------- | ------- | -------------------------- |
+| MkDocs Material | 9.6.12  | Documentation site builder |
+| mike            | 2.1.3   | Versioned doc deployment   |
+| semgrep         | latest  | Static analysis            |
+| pyyaml          | 6.0.3   | YAML parsing (MkDocs dep)  |
