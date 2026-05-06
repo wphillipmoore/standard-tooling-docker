@@ -2,11 +2,17 @@ name: CI
 
 on:
   pull_request:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      run-security:
+        type: boolean
+        default: true
+      run-release:
+        type: boolean
+        default: true
 
 permissions:
   contents: read
-  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,11 +21,18 @@ concurrency:
 jobs:
 
   # ---------------------------------------------------------------------------
-  # Quality: Hadolint, ShellCheck
+  # Quality
   # ---------------------------------------------------------------------------
 
+  quality:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-quality.yml@v1.5
+    with:
+      language: shell
+      versions: '["latest"]'
+      container-suffix: base
+
   hadolint:
-    name: "ci: hadolint"
+    name: "quality / hadolint"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,7 +51,7 @@ jobs:
         run: hadolint docker/*/Dockerfile
 
   shellcheck:
-    name: "ci: shellcheck"
+    name: "quality / shellcheck"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -48,17 +61,26 @@ jobs:
         run: shellcheck docker/build.sh docker/generate.sh
 
   # ---------------------------------------------------------------------------
-  # Security and standards (shared reusable workflow)
+  # Security and standards
   # ---------------------------------------------------------------------------
 
-  security-and-standards:
-    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@v1.4
+  security:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@v1.5
     with:
       language: shell
-      semgrep-language: dockerfile
-      run-standards: 'true'
-      run-security: 'true'
-      run-codeql: 'false'
+      run-codeql: false
+      run-standards: ${{ inputs.run-release || true }}
+      run-security: ${{ inputs.run-security || true }}
     permissions:
       contents: read
       security-events: write
+
+  # ---------------------------------------------------------------------------
+  # Release
+  # ---------------------------------------------------------------------------
+
+  release:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-release.yml@v1.5
+    with:
+      language: shell
+      run-release: ${{ inputs.run-release != false }}
