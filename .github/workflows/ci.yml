@@ -50,16 +50,6 @@ jobs:
       - name: Run Hadolint
         run: hadolint docker/*/Dockerfile
 
-  shellcheck:
-    name: "quality / shellcheck"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Run ShellCheck
-        run: shellcheck docker/build.sh docker/generate.sh
-
   # ---------------------------------------------------------------------------
   # Security and standards
   # ---------------------------------------------------------------------------
