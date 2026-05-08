@@ -304,7 +304,7 @@ The two phases are independent — neither blocks the other.
 | `st-docker-run -- bash -c "gh pr list"` | Passes (sees `bash`) | gh shim blocks | **Blocked** |
 | `st-docker-run -- bash -c "git push"` | Passes (sees `bash`) | git wrapper blocks | **Blocked** |
 | `st-docker-run -- bash -c "git log"` | Passes | git wrapper passes | **Works** |
-| `st-docker-run -- uv run st-validate-local` | Passes | Not triggered | **Works** |
+| `st-docker-run -- st-validate` | Passes | Not triggered | **Works** |
 | `git-cliff` inside container | N/A | git wrapper passes (read-only) | **Works** |
 | `validate_local_common_container` (uses git) | N/A | git wrapper passes (read-only) | **Works** |
 | `uv pip install ... @ git+https://...` (build time) | N/A | Wrapper not yet installed (later layer) | **Works** |
