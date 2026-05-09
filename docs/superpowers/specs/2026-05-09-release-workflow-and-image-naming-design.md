@@ -121,7 +121,7 @@ Jobs:
 
 - **docs** — calls `cd-docs.yml@v1.5` (all pushes)
 - **release** — calls `cd-release.yml@v1.5` (main push only), with
-  `language: shell`, `container-tag: latest`, `container-suffix: base`.
+  `language: base`, `container-tag: latest`.
   Passes `secrets: inherit`.
 - **docker-publish** — calls `cd-docker-publish.yml`. Depends on
   `release` with `if: always()` gated on success or skipped. Passes
