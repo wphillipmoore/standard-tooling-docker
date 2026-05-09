@@ -364,24 +364,16 @@ git rm .github/workflows/docker-publish.yml
 
 - [ ] **Step 2: Update standard-tooling.toml**
 
-The `[workflows.post-merge]` section currently references the old workflow:
+The file already has `[ci]`, `[publish]`, and `[workflows.post-merge]` sections. Two changes are needed:
+
+1. Update the workflow reference in `[workflows.post-merge]`:
 
 ```toml
-[workflows.post-merge]
-docker-publish = "docker-publish.yml"
-```
-
-Update to reference the new orchestrator and add the missing `[ci]` section:
-
-```toml
-[ci]
-versions = ["latest"]
-
 [workflows.post-merge]
 docker-publish = "cd.yml"
 ```
 
-Also add the `[publish]` release flag since this repo now has a release workflow:
+2. Add `release = true` to the existing `[publish]` section:
 
 ```toml
 [publish]
@@ -1012,6 +1004,6 @@ For every managed repo, update any hardcoded `dev-` image references to `prod-`.
 
 Use `grep -r "dev-base\|dev-python\|dev-ruby\|dev-java\|dev-go\|dev-rust" .github/workflows/` in each repo to find references.
 
-- [ ] **Step 7: Close issues**
+- [ ] **Step 7: Close issues and create tracking issue**
 
-Close #152, #139, #65, and #61 as completed by this work.
+Close #152, #139, #65, and #61 as completed by this work. Create a single tracking issue referencing all three source issues (#152, #139, #65) for cross-referencing.
