@@ -46,9 +46,10 @@ install them directly via pip.
 **Base**: `ruby:<version>-slim`
 **Versions**: 3.2, 3.3, 3.4
 
-| Tool    | Source     | Purpose                 |
-| ------- | ---------- | ----------------------- |
-| bundler | system gem | Ruby dependency manager |
+| Tool           | Source     | Purpose                 |
+| -------------- | ---------- | ----------------------- |
+| bundler        | system gem | Ruby dependency manager |
+| license_finder | gem        | License auditing        |
 
 ## Go
 
