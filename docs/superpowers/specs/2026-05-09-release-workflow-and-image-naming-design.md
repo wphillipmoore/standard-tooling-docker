@@ -23,7 +23,11 @@ This design combines three issues into a single coordinated effort:
 Key decisions made during brainstorming:
 
 - Nightly rebuilds target `dev-` images only. `prod-` images are built
-  exclusively by the CD release workflow on main merges.
+  exclusively by the CD release workflow on main merges. This means
+  `prod-` images may lag on upstream CVE fixes between releases. The
+  nightly `dev-` rebuild surfaces these issues early via GitHub Actions
+  failure notifications; automating the response (e.g., auto-opening a
+  PR to trigger a release) is future work.
 - No ephemeral cleanup workflow. Nightly rebuilds overwrite the same
   mutable tags, so there is no tag accumulation to clean up. Stale
   candidate/cache tag cleanup is handled by #125.
@@ -77,7 +81,7 @@ pointing a single consumer at `dev-` while debugging a broken workflow.
 |------|--------|---------|
 | `docker-publish.yml` | Delete | Replaced by cd-docker-publish.yml |
 | `cd-docker-publish.yml` | Create | Reusable `workflow_call` with `image-prefix` input. Contains the full build matrix, Trivy scanning, attestation, and promotion logic. |
-| `cd.yml` | Rewrite | Thin shim orchestrating cd-docs, cd-release, and cd-docker-publish |
+| `cd.yml` | Extend | Thin shim orchestrating cd-docs, cd-release, and cd-docker-publish |
 | `ops.yml` | Create/extend | Scheduled operations: github-config audit + nightly dev image rebuild |
 
 ### cd-docker-publish.yml
@@ -100,15 +104,23 @@ The `IMAGE` env var becomes:
 ghcr.io/wphillipmoore/${{ inputs.image-prefix }}-${{ matrix.language }}:${{ matrix.version }}
 ```
 
-All other build logic (QEMU, Buildx, Trivy scan, attestation, candidate
-promotion, digest verification) remains unchanged.
+All other build logic (QEMU, Buildx, Trivy scan, candidate promotion,
+digest verification) remains unchanged except that the `CANDIDATE`,
+`CACHE_TAG` env vars and the attestation `subject-name` must also be
+parameterized by `image-prefix` — these currently hardcode `dev-`.
 
 The workflow is structured as `workflow_call` to be reusable-ready, even
 though it is currently only called locally.
 
+The existing `publish-base` job is kept as a separate job within this
+workflow (not folded into the language matrix), parameterized by
+`image-prefix`. The base image uses `:latest` instead of a version
+number and has no `build-arg`, so it does not fit the matrix pattern.
+
 ### cd.yml
 
-Thin orchestration shim:
+Extends the existing cd.yml (created by #172) which currently calls
+cd-docs only. Becomes the thin orchestration shim:
 
 ```yaml
 on:
@@ -120,11 +132,18 @@ on:
 Jobs:
 
 - **docs** — calls `cd-docs.yml@v1.5` (all pushes)
-- **release** — calls `cd-release.yml@v1.5` (main push only), with
-  `language: base`, `container-tag: latest`.
+- **release** — calls `cd-release.yml@v1.5` (main push only, see
+  [standard-actions](https://github.com/wphillipmoore/standard-actions)),
+  with `language: base`, `container-tag: latest`.
   Passes `secrets: inherit`.
 - **docker-publish** — calls `cd-docker-publish.yml`. Depends on
-  `release` with `if: always()` gated on success or skipped. Passes
+  `release` with:
+  ```yaml
+  if: always() && (needs.release.result == 'success' || needs.release.result == 'skipped')
+  ```
+  This ensures docker-publish runs after a successful release (main) or
+  when release is skipped (develop), but does NOT run if the release job
+  fails. Passes
   `image-prefix: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}`
 
 On develop push: release is skipped, docker-publish runs with `dev`.
@@ -193,18 +212,23 @@ before they exist.
    (changelog, tag, version-bump PR), then docker-publish runs with
    `prod-` prefix. This creates the first set of `prod-` images.
 
-4. **GHCR package permissions.** Each new `prod-` package needs the
-   one-time "Add Repository -> standard-tooling-docker -> Write" setup
-   in GHCR package settings. Applies to: `prod-base`, `prod-python`,
-   `prod-java`, `prod-go`, `prod-ruby`, `prod-rust`.
+4. **GHCR package setup.** Each new `prod-` package needs one-time
+   configuration in GHCR package settings:
+   - **Visibility:** set to Public (matching the `dev-` packages).
+     Auto-created packages default to private in user namespaces.
+   - **Actions access:** Add Repository → standard-tooling-docker → Write.
+   Applies to: `prod-base`, `prod-python`, `prod-java`, `prod-go`,
+   `prod-ruby`, `prod-rust`.
 
 5. **Land consumer-side changes in standard-tooling.** `st-docker-run`
    defaults to `prod-` prefix. Reusable CI workflows reference `prod-`
-   images.
+   images. This is backward-compatible — at first publish, `prod-` and
+   `dev-` images are identical.
 
-6. **Update consuming repos.** Any repo with hardcoded `dev-` image
-   references (including this repo's own `ci.yml` hadolint job) gets
-   updated to `prod-`.
+6. **Update consuming repos.** Fleet-wide sweep of all managed repos to
+   replace hardcoded `dev-` image references (including this repo's own
+   `ci.yml` hadolint job) with `prod-`. Done immediately after step 5
+   lands.
 
 Until step 3 completes, `dev-` images remain the only images available,
 so consumers are unaffected during the transition.
