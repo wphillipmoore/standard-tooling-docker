@@ -14,9 +14,10 @@ versions = ["latest"]
 integration-tests = false
 
 [workflows.post-merge]
-docker-publish = "docker-publish.yml"
+docker-publish = "cd.yml"
 
 [publish]
+release = true
 docs = true
 
 [ci]
