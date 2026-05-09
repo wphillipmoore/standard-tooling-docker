@@ -1,0 +1,16 @@
+# https://github.com/wphillipmoore/standard-actions/blob/develop/.github/workflows/README.md
+name: CD
+
+on:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  docs:
+    uses: wphillipmoore/standard-actions/.github/workflows/cd-docs.yml@v1.5
+    permissions:
+      contents: write
