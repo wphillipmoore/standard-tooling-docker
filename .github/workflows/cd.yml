@@ -8,9 +8,40 @@ on:
 
 permissions:
   contents: write
+  packages: write
+  security-events: write
+  attestations: write
+  id-token: write
+  pull-requests: write
 
 jobs:
   docs:
     uses: wphillipmoore/standard-actions/.github/workflows/cd-docs.yml@v1.5
     permissions:
       contents: write
+
+  release:
+    if: github.ref == 'refs/heads/main'
+    uses: wphillipmoore/standard-actions/.github/workflows/cd-release.yml@v1.5
+    with:
+      language: base
+      container-tag: latest
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      attestations: write
+
+  docker-publish:
+    needs: [release]
+    if: always() && (needs.release.result == 'success' || needs.release.result == 'skipped')
+    uses: ./.github/workflows/cd-docker-publish.yml
+    with:
+      image-prefix: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+    permissions:
+      packages: write
+      contents: read
+      security-events: write
+      attestations: write
+      id-token: write
