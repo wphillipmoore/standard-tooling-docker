@@ -663,6 +663,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#release-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Release workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nightly-rebuilds" class="md-nav__link">
+    <span class="md-ellipsis">
+      Nightly rebuilds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
       Authentication
@@ -808,6 +826,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#release-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Release workflow
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nightly-rebuilds" class="md-nav__link">
+    <span class="md-ellipsis">
+      Nightly rebuilds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
       Authentication
@@ -932,8 +968,17 @@ architecture only (for speed). The CI pipeline builds both platforms
 using QEMU emulation on the GitHub Actions runner.</p>
 <h2 id="publishing">Publishing<a class="headerlink" href="#publishing" title="Permanent link">&para;</a></h2>
 <p>Images are published as multi-arch manifests to GitHub Container Registry
-on every push to <code>develop</code> or <code>main</code> via the <code>docker-publish.yml</code>
-workflow. The pipeline:</p>
+via the reusable <code>cd-docker-publish.yml</code> workflow, parameterized by an
+<code>image-prefix</code> input that determines the naming convention:</p>
+<ul>
+<li><strong><code>dev-</code> images</strong> (<code>ghcr.io/wphillipmoore/dev-{language}:{version}</code>) —
+  built on every push to <code>develop</code> and rebuilt nightly via <code>ops.yml</code> to
+  pick up base-image security patches.</li>
+<li><strong><code>prod-</code> images</strong> (<code>ghcr.io/wphillipmoore/prod-{language}:{version}</code>) —
+  built on push to <code>main</code>, after the release workflow generates a
+  changelog, git tag, and GitHub release.</li>
+</ul>
+<p>The publish pipeline for each prefix:</p>
 <ol>
 <li>Builds a candidate tag for both platforms (amd64 + arm64)</li>
 <li>Scans each platform independently with Trivy (SARIF upload)</li>
@@ -946,16 +991,28 @@ workflow. The pipeline:</p>
 a repo-specific namespace. This means image paths are stable across
 repository migrations — they do not change when the publishing repository
 changes.</p>
+<p>Image naming: <code>ghcr.io/wphillipmoore/{prefix}-{language}:{version}</code> where
+<code>{prefix}</code> is <code>dev</code> or <code>prod</code>.</p>
+<h3 id="release-workflow">Release workflow<a class="headerlink" href="#release-workflow" title="Permanent link">&para;</a></h3>
+<p>Pushes to <code>main</code> trigger the <code>cd-release.yml</code> reusable workflow, which
+generates a changelog (via git-cliff), creates a git tag and GitHub
+release, and opens a version-bump PR back to <code>develop</code>. The docker
+publish job runs after the release completes.</p>
+<h3 id="nightly-rebuilds">Nightly rebuilds<a class="headerlink" href="#nightly-rebuilds" title="Permanent link">&para;</a></h3>
+<p>The <code>ops.yml</code> workflow runs daily at 06:15 UTC and rebuilds all <code>dev-</code>
+images. This ensures development images stay current with upstream
+security patches without waiting for a code change to trigger a build.</p>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
 <p>The workflow authenticates with <code>GITHUB_TOKEN</code> using <code>packages: write</code>
 permission. No personal access token or additional secret is needed.</p>
 <h3 id="ghcr-package-access-grants">GHCR package access grants<a class="headerlink" href="#ghcr-package-access-grants" title="Permanent link">&para;</a></h3>
-<p>Each <code>dev-*</code> package on GHCR must explicitly grant this repository write
-access. The packages were originally created by the <code>standard-tooling</code>
-repository, so that repo has implicit write access. This repo does not,
-unless manually configured.</p>
-<p>Per-package setup (one-time, for each of <code>dev-python</code>, <code>dev-java</code>,
-<code>dev-go</code>, <code>dev-ruby</code>, <code>dev-rust</code>, <code>dev-base</code>):</p>
+<p>Each <code>dev-*</code> and <code>prod-*</code> package on GHCR must explicitly grant this
+repository write access. The packages were originally created by the
+<code>standard-tooling</code> repository, so that repo has implicit write access.
+This repo does not, unless manually configured.</p>
+<p>Per-package setup (one-time, for each of <code>dev-base</code>, <code>dev-python</code>,
+<code>dev-java</code>, <code>dev-go</code>, <code>dev-ruby</code>, <code>dev-rust</code>, and the corresponding
+<code>prod-</code> packages):</p>
 <ol>
 <li>Navigate to the package settings page on GHCR.</li>
 <li>Under <strong>Manage Actions access</strong>, click <strong>Add Repository</strong>.</li>
