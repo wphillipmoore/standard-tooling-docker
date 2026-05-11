@@ -7,3 +7,10 @@ Thumbs.db
 .env
 .env.*
 *.log
+trivy-out.json
+
+# Generated Dockerfiles — source of truth is Dockerfile.template
+docker/*/Dockerfile
+
+# Parallel AI agent worktrees (see CLAUDE.md)
+.worktrees/

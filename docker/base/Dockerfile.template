@@ -1,0 +1,45 @@
+# Generated from Dockerfile.template — DO NOT EDIT the Dockerfile directly.
+# Canonical source: https://github.com/wphillipmoore/standard-tooling-docker
+# dev-base — Base dev container with all common tooling. Language-specific
+# images extend this with runtime and language-specific tools.
+FROM python:3.14-slim
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# --- System packages ---------------------------------------------------------
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+      git curl jq openssh-client xz-utils gnupg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# @include common/path-defaults.dockerfile
+# @include common/node-markdownlint.dockerfile
+# @include common/github-cli.dockerfile
+# @include common/validation-tools.dockerfile
+
+# --- Python tools ------------------------------------------------------------
+# Upgrade system pip past CVE-2026-3219 (TAR/ZIP polyglot in archive
+# parsing). pip 26.0.1 is affected; 26.1 is the fix. Issue #59.
+RUN pip install --no-cache-dir --upgrade 'pip>=26.1' && \
+    pip install --no-cache-dir yamllint==1.38.0 uv==0.7.12
+
+# --- MkDocs ------------------------------------------------------------------
+ARG MKDOCS_MATERIAL_VERSION=9.6.12
+ARG MIKE_VERSION=2.1.3
+RUN pip install --no-cache-dir \
+      "mkdocs-material==${MKDOCS_MATERIAL_VERSION}" \
+      "mike==${MIKE_VERSION}" \
+      pyyaml==6.0.3
+
+# --- Semgrep -----------------------------------------------------------------
+# Semgrep has a native extension (semgrep-core) that requires compilation.
+# Install build-essential for gcc, build, then remove to keep the image slim.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    uv tool install semgrep && \
+    apt-get purge -y --auto-remove build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8000
+
+WORKDIR /workspace

@@ -1,74 +1,60 @@
+# https://github.com/wphillipmoore/standard-actions/blob/develop/.github/workflows/README.md
 name: CI
 
 on:
   pull_request:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      run-security:
+        type: boolean
+        default: true
+      run-release:
+        type: boolean
+        default: true
 
 permissions:
   contents: read
-  security-events: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-
-  # ---------------------------------------------------------------------------
-  # Quality: Hadolint, ShellCheck, Markdownlint
-  # ---------------------------------------------------------------------------
-
   hadolint:
-    name: "ci: hadolint"
+    name: "quality / hadolint"
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/wphillipmoore/dev-base:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Download Hadolint
-        run: |
-          curl -sL "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-Linux-x86_64" \
-            -o /usr/local/bin/hadolint
-          chmod +x /usr/local/bin/hadolint
+      - name: Generate Dockerfiles from templates
+        run: docker/generate.sh
 
       - name: Run Hadolint
         run: hadolint docker/*/Dockerfile
 
-  shellcheck:
-    name: "ci: shellcheck"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Run ShellCheck
-        run: shellcheck docker/build.sh
-
-  markdownlint:
-    name: "ci: markdownlint"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli@0.41.0
-
-      - name: Run Markdownlint
-        run: markdownlint README.md
-
-  # ---------------------------------------------------------------------------
-  # Security and standards (shared reusable workflow)
-  # ---------------------------------------------------------------------------
-
-  security-and-standards:
-    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@develop
+  quality:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-quality.yml@v1.5
     with:
       language: shell
-      semgrep-language: dockerfile
-      run-standards: 'true'
-      run-security: 'true'
-      run-codeql: 'false'
+      versions: '["latest"]'
+      container-suffix: base
+
+  security:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-security.yml@v1.5
+    with:
+      language: shell
+      run-codeql: false
+      run-standards: ${{ inputs.run-release != 'false' }}
+      run-security: ${{ inputs.run-security != 'false' }}
     permissions:
       contents: read
       security-events: write
+
+  version:
+    uses: wphillipmoore/standard-actions/.github/workflows/ci-version-bump.yml@v1.5
+    with:
+      language: shell
+      run-release: ${{ inputs.run-release != 'false' }}
