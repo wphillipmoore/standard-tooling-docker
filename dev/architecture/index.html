@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Docker dev container images for the standard-tooling ecosystem">
+        <meta name="description" content="Docker dev container images for the VERGIL ecosystem">
       
       
       
@@ -192,13 +192,13 @@
     
     
       <div class="md-header__source">
-        <a href="https://github.com/wphillipmoore/standard-tooling-docker" title="Go to repository" class="md-source" data-md-component="source">
+        <a href="https://github.com/vergil-project/vergil-docker" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
   </div>
   <div class="md-source__repository">
-    wphillipmoore/standard-tooling-docker
+    vergil-project/vergil-docker
   </div>
 </a>
       </div>
@@ -330,13 +330,13 @@
   </label>
   
     <div class="md-nav__source">
-      <a href="https://github.com/wphillipmoore/standard-tooling-docker" title="Go to repository" class="md-source" data-md-component="source">
+      <a href="https://github.com/vergil-project/vergil-docker" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
   </div>
   <div class="md-source__repository">
-    wphillipmoore/standard-tooling-docker
+    vergil-project/vergil-docker
   </div>
 </a>
     </div>
@@ -1001,10 +1001,10 @@ using QEMU emulation on the GitHub Actions runner.</p>
 via the reusable <code>cd-docker-publish.yml</code> workflow, parameterized by an
 <code>image-prefix</code> input that determines the naming convention:</p>
 <ul>
-<li><strong><code>dev-</code> images</strong> (<code>ghcr.io/wphillipmoore/dev-{language}:{version}</code>) —
+<li><strong><code>dev-</code> images</strong> (<code>ghcr.io/vergil-project/dev-{language}:{version}</code>) —
   built on every push to <code>develop</code> and rebuilt nightly via <code>ops.yml</code> to
   pick up base-image security patches.</li>
-<li><strong><code>prod-</code> images</strong> (<code>ghcr.io/wphillipmoore/prod-{language}:{version}</code>) —
+<li><strong><code>prod-</code> images</strong> (<code>ghcr.io/vergil-project/prod-{language}:{version}</code>) —
   built on push to <code>main</code>, after the release workflow generates a
   changelog, git tag, and GitHub release.</li>
 </ul>
@@ -1017,11 +1017,11 @@ via the reusable <code>cd-docker-publish.yml</code> workflow, parameterized by a
 <li>Verifies digest preservation between candidate and final</li>
 </ol>
 <h3 id="image-namespace">Image namespace<a class="headerlink" href="#image-namespace" title="Permanent link">&para;</a></h3>
-<p>Image URLs use the <strong>user namespace</strong> (<code>ghcr.io/wphillipmoore/...</code>), not
+<p>Image URLs use the <strong>user namespace</strong> (<code>ghcr.io/vergil-project/...</code>), not
 a repo-specific namespace. This means image paths are stable across
 repository migrations — they do not change when the publishing repository
 changes.</p>
-<p>Image naming: <code>ghcr.io/wphillipmoore/{prefix}-{language}:{version}</code> where
+<p>Image naming: <code>ghcr.io/vergil-project/{prefix}-{language}:{version}</code> where
 <code>{prefix}</code> is <code>dev</code> or <code>prod</code>.</p>
 <h3 id="release-workflow">Release workflow<a class="headerlink" href="#release-workflow" title="Permanent link">&para;</a></h3>
 <p>Pushes to <code>main</code> trigger the <code>cd-release.yml</code> reusable workflow, which
@@ -1038,7 +1038,7 @@ permission. No personal access token or additional secret is needed.</p>
 <h3 id="ghcr-package-access-grants">GHCR package access grants<a class="headerlink" href="#ghcr-package-access-grants" title="Permanent link">&para;</a></h3>
 <p>Each <code>dev-*</code> and <code>prod-*</code> package on GHCR must explicitly grant this
 repository write access. The packages were originally created by the
-<code>standard-tooling</code> repository, so that repo has implicit write access.
+<code>vergil-tooling</code> repository, so that repo has implicit write access.
 This repo does not, unless manually configured.</p>
 <p>Per-package setup (one-time, for each of <code>dev-base</code>, <code>dev-python</code>,
 <code>dev-java</code>, <code>dev-go</code>, <code>dev-ruby</code>, <code>dev-rust</code>, and the corresponding
@@ -1046,14 +1046,14 @@ This repo does not, unless manually configured.</p>
 <ol>
 <li>Navigate to the package settings page on GHCR.</li>
 <li>Under <strong>Manage Actions access</strong>, click <strong>Add Repository</strong>.</li>
-<li>Select <code>standard-tooling-docker</code>.</li>
+<li>Select <code>vergil-docker</code>.</li>
 <li>Set role to <strong>Write</strong>.</li>
 </ol>
 <h2 id="consumption">Consumption<a class="headerlink" href="#consumption" title="Permanent link">&para;</a></h2>
-<p>Images are consumed via <code>st-docker-run</code> and <code>st-docker-test</code> in
-<a href="https://github.com/wphillipmoore/standard-tooling">standard-tooling</a>.
-<code>st-docker-run</code> runs arbitrary commands inside the matching container;
-<code>st-docker-test</code> auto-detects the project language and runs the test
+<p>Images are consumed via <code>vrg-docker-run</code> and <code>vrg-docker-test</code> in
+<a href="https://github.com/vergil-project/vergil-tooling">vergil-tooling</a>.
+<code>vrg-docker-run</code> runs arbitrary commands inside the matching container;
+<code>vrg-docker-test</code> auto-detects the project language and runs the test
 suite. Consuming repos can override the image with the <code>DOCKER_DEV_IMAGE</code>
 environment variable.</p>
 
